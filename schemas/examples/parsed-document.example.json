@@ -1,0 +1,22 @@
+{
+  "doc_id": "example_0001",
+  "source": "cuad",
+  "title": "Example Agreement",
+  "contract_type": "unknown",
+  "raw_text": "ARTICLE I TERM\nThis lasts.",
+  "char_length": 26,
+  "raw_sha256": "5e090034e0f11bfd66b3caed58f1af01e294d4ccfefc5b2da22a15aa5de9ee28",
+  "nodes": [
+    {
+      "node_id": "example_0001/article-i",
+      "parent_id": null,
+      "type": "article",
+      "number": "I",
+      "heading": "TERM",
+      "text": "ARTICLE I TERM\nThis lasts.",
+      "char_start": 0,
+      "char_end": 26,
+      "depth": 0
+    }
+  ]
+}

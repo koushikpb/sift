@@ -1,0 +1,12 @@
+{
+  "label_id": "example_0001::clause::document-name::0",
+  "doc_id": "example_0001",
+  "source": "cuad",
+  "kind": "clause_span",
+  "clause_type": "Document Name",
+  "hypothesis": null,
+  "nli_label": null,
+  "spans": [
+    { "char_start": 0, "char_end": 14, "quote": "ARTICLE I TERM" }
+  ]
+}
