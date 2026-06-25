@@ -92,12 +92,15 @@ def parse_structure(doc_id: str, text: str) -> list[Node]:
         stack.append((h["level"], node_id))
 
     # 3) Definitions: inline leaves attached to the deepest containing structural node.
+    #    Only structural nodes (not other definitions) are eligible as containers so that
+    #    sibling definitions in the same section are not incorrectly nested into each other.
+    structural_nodes = nodes[:]  # snapshot before we start appending definitions
     for dm in _DEFINITION.finditer(text):
         ds, de = dm.start(), dm.end()
         dot = text.find(".", de)
         dend = dot + 1 if dot != -1 else de
         container = None
-        for node in nodes:
+        for node in structural_nodes:
             if node.char_start <= ds < node.char_end and (
                 container is None or node.depth >= container.depth
             ):
