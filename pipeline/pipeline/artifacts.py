@@ -1,7 +1,7 @@
 """Pydantic models mirroring schemas/*.json — the canonical artifact types."""
 from __future__ import annotations
 
-from typing import Literal, Optional
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -22,10 +22,10 @@ class Span(BaseModel):
 class Node(BaseModel):
     model_config = ConfigDict(extra="forbid")
     node_id: str
-    parent_id: Optional[str] = None
+    parent_id: str | None = None
     type: NodeType
-    number: Optional[str] = None
-    heading: Optional[str] = None
+    number: str | None = None
+    heading: str | None = None
     text: str
     char_start: int
     char_end: int
@@ -36,7 +36,7 @@ class ParsedDocument(BaseModel):
     model_config = ConfigDict(extra="forbid")
     doc_id: str
     source: Source
-    title: Optional[str] = None
+    title: str | None = None
     contract_type: str
     raw_text: str
     char_length: int
@@ -50,7 +50,7 @@ class GoldLabel(BaseModel):
     doc_id: str
     source: Source
     kind: Literal["clause_span", "nli"]
-    clause_type: Optional[str] = None
-    hypothesis: Optional[str] = None
-    nli_label: Optional[Literal["entailment", "contradiction", "not_mentioned"]] = None
+    clause_type: str | None = None
+    hypothesis: str | None = None
+    nli_label: Literal["entailment", "contradiction", "not_mentioned"] | None = None
     spans: list[Span] = []

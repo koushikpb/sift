@@ -31,6 +31,7 @@ describe("loader", () => {
   });
 
   afterAll(async () => {
+    await withClient((c) => c.query("DELETE FROM documents WHERE doc_id LIKE 'loadtest_%'"));
     await pool.end();
   });
 

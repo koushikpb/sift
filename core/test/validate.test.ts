@@ -28,6 +28,7 @@ describe("validateEvalSet", () => {
   });
 
   afterAll(async () => {
+    await withClient((c) => c.query("DELETE FROM documents WHERE doc_id LIKE 'evaltest_%'"));
     await pool.end();
   });
 
