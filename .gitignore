@@ -27,3 +27,6 @@ dist/
 
 # Unrelated local Obsidian vault (semiconductor notes — not part of this project)
 /sift/
+
+# eval intermediates
+evals/data/candidates.jsonl

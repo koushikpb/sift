@@ -35,3 +35,9 @@ ingest:
 	cd pipeline && .venv/bin/python -m pipeline.cli ingest
 parse:
 	cd pipeline && .venv/bin/python -m pipeline.cli parse
+
+.PHONY: eval-derive eval-validate
+eval-derive:
+	cd core && npm run eval -- derive
+eval-validate:
+	cd core && npm run eval -- validate
