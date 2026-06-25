@@ -1,12 +1,28 @@
-"""Normalize CUAD (HF `theatticusproject/cuad-qa`) into ParsedDocument + GoldLabel."""
+"""Normalize CUAD (CUAD_v1.json, SQuAD format) into ParsedDocument + GoldLabel.
+
+`theatticusproject/cuad-qa` is a script-based HF dataset rejected by datasets>=3.
+We download the plain CUAD_v1.json file directly and flatten it to the flat-record
+shape that normalize_cuad expects.
+"""
 from __future__ import annotations
 
 import hashlib
+import json
 import re
+from pathlib import Path
+
+import requests
 
 from pipeline.artifacts import GoldLabel, ParsedDocument, Span
 
 _CLAUSE_TYPE = re.compile(r'related to [""]([^""]+)[""]')
+
+_CUAD_URL = (
+    "https://huggingface.co/datasets/theatticusproject/cuad"
+    "/resolve/main/CUAD_v1/CUAD_v1.json"
+)
+_REPO_ROOT = Path(__file__).parents[3]
+_CUAD_PATH = _REPO_ROOT / "data" / "raw" / "cuad" / "CUAD_v1.json"
 
 
 def _doc_id(title: str) -> str:
@@ -17,6 +33,26 @@ def _doc_id(title: str) -> str:
 def _clause_type(question: str) -> str | None:
     m = _CLAUSE_TYPE.search(question)
     return m.group(1).strip() if m else None
+
+
+def _flatten_squad(squad: dict) -> list[dict]:
+    """Flatten CUAD SQuAD-format JSON into the flat records normalize_cuad expects."""
+    records: list[dict] = []
+    for entry in squad["data"]:
+        for para in entry["paragraphs"]:
+            context = para["context"]
+            for qa in para["qas"]:
+                answers = qa.get("answers", []) or []
+                records.append({
+                    "title": entry["title"],
+                    "context": context,
+                    "question": qa["question"],
+                    "answers": {
+                        "text": [a["text"] for a in answers],
+                        "answer_start": [a["answer_start"] for a in answers],
+                    },
+                })
+    return records
 
 
 def normalize_cuad(records: list[dict]) -> tuple[list[ParsedDocument], list[GoldLabel]]:
@@ -66,9 +102,23 @@ def normalize_cuad(records: list[dict]) -> tuple[list[ParsedDocument], list[Gold
 
 
 def load_cuad_qa(limit: int | None = None) -> list[dict]:
-    """Download the CUAD-QA test split from Hugging Face. Network-bound; not unit-tested."""
-    from datasets import load_dataset  # imported lazily so tests don't require the network
+    """Load CUAD from CUAD_v1.json (SQuAD format) and return flat records.
 
-    ds = load_dataset("theatticusproject/cuad-qa", split="test")
-    rows = ds.select(range(min(limit, len(ds)))) if limit else ds
-    return [dict(r) for r in rows]
+    The file is read from data/raw/cuad/CUAD_v1.json (relative to repo root).
+    If missing, it is downloaded from the theatticusproject/cuad HF dataset.
+    theatticusproject/cuad-qa is script-based and rejected by datasets>=3, so
+    we use the plain JSON file instead.
+    """
+    if not _CUAD_PATH.exists():
+        _CUAD_PATH.parent.mkdir(parents=True, exist_ok=True)
+        with requests.get(_CUAD_URL, stream=True, timeout=120) as resp:
+            resp.raise_for_status()
+            with _CUAD_PATH.open("wb") as fh:
+                for chunk in resp.iter_content(chunk_size=1 << 20):
+                    fh.write(chunk)
+
+    with _CUAD_PATH.open(encoding="utf-8") as fh:
+        squad = json.load(fh)
+
+    records = _flatten_squad(squad)
+    return records[:limit] if limit else records

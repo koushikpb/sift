@@ -3,6 +3,7 @@
 Architectural decisions, kept current as they are made. Newest first.
 
 ## 2026-06-24 — Phase 0 foundations
+- **CUAD sourced from `theatticusproject/cuad`'s `CUAD_v1.json` (SQuAD format), not `cuad-qa`.** The `theatticusproject/cuad-qa` HF dataset is script-based and `datasets`>=3 refuses to run dataset scripts; the plain `CUAD_v1.json` file is downloaded directly and flattened to the flat-record shape `normalize_cuad` expects.
 - **Hybrid language split.** Python (`pipeline/`) owns ingestion + the structure-aware
   parser; TypeScript (`core/`) owns the pgvector schema, loader, and eval tooling. They meet
   only at on-disk JSON artifacts validated against `schemas/`. Rationale: keep data-heavy

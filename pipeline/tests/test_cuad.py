@@ -1,4 +1,4 @@
-from pipeline.ingest.cuad import normalize_cuad
+from pipeline.ingest.cuad import _flatten_squad, normalize_cuad
 
 
 def _records():
@@ -49,3 +49,60 @@ def test_gold_labels_carry_clause_type_and_exact_spans():
         sp = g.spans[0]
         # Citation invariant: quote equals the raw_text slice.
         assert raw[sp.char_start:sp.char_end] == sp.quote
+
+
+def test_flatten_squad_produces_normalizable_records():
+    context = "This contract is governed by the laws of the State of California."
+    answer_text = "State of California"
+    answer_start = context.index(answer_text)
+
+    squad = {
+        "data": [
+            {
+                "title": "ACME NDA",
+                "paragraphs": [
+                    {
+                        "context": context,
+                        "qas": [
+                            {
+                                "question": 'Highlight the parts related to "Governing Law" ...',
+                                "id": "qa-1",
+                                "is_impossible": False,
+                                "answers": [
+                                    {"text": answer_text, "answer_start": answer_start}
+                                ],
+                            },
+                            {
+                                "question": (
+                                    'Highlight the parts related to "Uncapped Liability" ...'
+                                ),
+                                "id": "qa-2",
+                                "is_impossible": True,
+                                "answers": [],
+                            },
+                        ],
+                    }
+                ],
+            }
+        ]
+    }
+
+    records = _flatten_squad(squad)
+
+    # Must produce exactly 2 flat records
+    assert len(records) == 2
+    for rec in records:
+        assert set(rec.keys()) >= {"title", "context", "question", "answers"}
+        assert isinstance(rec["answers"], dict)
+        assert "text" in rec["answers"]
+        assert "answer_start" in rec["answers"]
+
+    # Pipe through normalize_cuad: 1 doc, 1 gold label (impossible/empty skipped)
+    docs, gold = normalize_cuad(records)
+    assert len(docs) == 1
+    assert len(gold) == 1
+
+    # Citation invariant: raw_text[start:end] == quote
+    raw = docs[0].raw_text
+    sp = gold[0].spans[0]
+    assert raw[sp.char_start:sp.char_end] == sp.quote
