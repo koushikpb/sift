@@ -19,3 +19,11 @@ Architectural decisions, kept current as they are made. Newest first.
   and loads structured chunks without vectors; the embedder is a measured P1/P2 experiment,
   so committing to a model/dimension now would be premature. Embedding column dimension is
   a single documented constant (`embeddings.embedding vector(1024)`) that P1 confirms.
+- **`GoldLabel` spans omit `doc_id`; `EvalItem` gold_spans carry it.** A `GoldLabel` belongs
+  to exactly one document, so its `spans` inherit the label's top-level `doc_id` rather than
+  repeating it (DRY; the shared Python `Span` model stays minimal). `EvalItem.gold_spans`
+  *do* carry `doc_id` because the eval harness treats each citation as self-describing and an
+  item may, in principle, reference more than one document. The two span shapes are used in
+  different layers (Python ingestion vs TS eval) and are intentionally not a single shared
+  type. The canonical citation format `{ doc_id, char_start, char_end, quote }` is the
+  self-describing form; `GoldLabel` spans are the inherited-context form.
