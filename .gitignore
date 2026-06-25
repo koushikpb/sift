@@ -30,3 +30,4 @@ dist/
 
 # eval intermediates
 evals/data/candidates.jsonl
+/.claude
