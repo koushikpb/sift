@@ -34,6 +34,20 @@ def test_articles_sections_subsections_definitions_exhibits_detected():
     assert {n.number for n in _by(nodes, "exhibit")} == {"A"}
 
 
+def test_repeated_definition_terms_get_unique_node_ids():
+    text = (
+        'ARTICLE I DEFINITIONS\n'
+        '"Affiliate" means a controlled entity.\n'
+        'Section 1.1 Scope\n'
+        '"Affiliate" means any parent company.\n'
+    )
+    nodes = parse_structure("doc1", text)
+    defs = [n for n in nodes if n.type == "definition"]
+    assert len(defs) == 2
+    assert len({n.node_id for n in defs}) == 2
+    assert len({n.node_id for n in nodes}) == len(nodes)
+
+
 def test_hierarchy_parents_are_correct():
     nodes = parse_structure("doc1", TEXT)
     by_id = {n.node_id: n for n in nodes}

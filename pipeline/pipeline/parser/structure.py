@@ -103,8 +103,12 @@ def parse_structure(doc_id: str, text: str) -> list[Node]:
             ):
                 container = node
         term = dm.group(1)
+        def_base = f"{doc_id}/definition-{_slug(term)}"
+        k = used.get(def_base, 0)
+        used[def_base] = k + 1
+        def_node_id = def_base if k == 0 else f"{def_base}-{k}"
         nodes.append(Node(
-            node_id=f"{doc_id}/definition-{_slug(term)}",
+            node_id=def_node_id,
             parent_id=container.node_id if container else None,
             type="definition", number=None, heading=term,
             text=text[ds:dend], char_start=ds, char_end=dend,
