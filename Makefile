@@ -17,6 +17,10 @@ ts-typecheck:
 migrate:
 	cd core && npm run migrate
 
+.PHONY: load
+load:
+	cd core && npm run load
+
 .PHONY: db-up db-down
 db-up:
 	docker compose up -d db
