@@ -41,3 +41,13 @@ eval-derive:
 	cd core && npm run eval -- derive
 eval-validate:
 	cd core && npm run eval -- validate
+
+.PHONY: verify-p0
+verify-p0: db-up migrate
+	@echo "== 1/3 parser hierarchy gate (10 contracts) =="
+	cd pipeline && .venv/bin/python -m pytest tests/test_parse_gate.py -q
+	@echo "== 2/3 corpus loaded =="
+	cd core && npm run load
+	@echo "== 3/3 eval set v1 (50 items) =="
+	cd core && npm run eval -- validate
+	@echo "PHASE 0 GATE PASSED"
