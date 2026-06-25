@@ -29,3 +29,9 @@ db-up:
 	@echo "postgres ready on localhost:5433"
 db-down:
 	docker compose down
+
+.PHONY: ingest parse
+ingest:
+	cd pipeline && .venv/bin/python -m pipeline.cli ingest
+parse:
+	cd pipeline && .venv/bin/python -m pipeline.cli parse
