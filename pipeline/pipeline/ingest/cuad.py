@@ -66,9 +66,9 @@ def normalize_cuad(records: list[dict]) -> tuple[list[ParsedDocument], list[Gold
 
 
 def load_cuad_qa(limit: int | None = None) -> list[dict]:
-    """Download the CUAD-QA validation split from Hugging Face. Network-bound; not unit-tested."""
+    """Download the CUAD-QA test split from Hugging Face. Network-bound; not unit-tested."""
     from datasets import load_dataset  # imported lazily so tests don't require the network
 
     ds = load_dataset("theatticusproject/cuad-qa", split="test")
-    rows = ds.select(range(limit)) if limit else ds
+    rows = ds.select(range(min(limit, len(ds)))) if limit else ds
     return [dict(r) for r in rows]
