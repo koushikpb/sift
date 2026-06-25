@@ -12,3 +12,12 @@ ts-test:
 	cd core && npm test
 ts-typecheck:
 	cd core && npm run typecheck
+
+.PHONY: db-up db-down
+db-up:
+	docker compose up -d db
+	@echo "waiting for postgres..."
+	@until docker compose exec -T db pg_isready -U sift -d sift >/dev/null 2>&1; do sleep 1; done
+	@echo "postgres ready on localhost:5433"
+db-down:
+	docker compose down
