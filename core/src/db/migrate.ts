@@ -1,5 +1,6 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
+import { resolve } from "node:path";
 import { withClient } from "./client.js";
 
 const MIGRATIONS_DIR = fileURLToPath(new URL("../../migrations", import.meta.url));
@@ -30,8 +31,8 @@ export async function migrate(): Promise<string[]> {
   return applied;
 }
 
-// Allow `tsx src/db/migrate.ts` as a CLI.
-if (import.meta.url === `file://${process.argv[1]}`) {
+// Allow `tsx src/db/migrate.ts` as a CLI (robust under tsx's relative argv[1]).
+if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
   migrate().then((a) => {
     console.log(a.length ? `applied: ${a.join(", ")}` : "no pending migrations");
     process.exit(0);
