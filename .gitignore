@@ -22,12 +22,8 @@ dist/
 # OS
 .DS_Store
 
-# APM agent working state
-.apm/
-
-# Unrelated local Obsidian vault (semiconductor notes — not part of this project)
-/sift/
+/.claude
 
 # eval intermediates
 evals/data/candidates.jsonl
-/.claude
+
