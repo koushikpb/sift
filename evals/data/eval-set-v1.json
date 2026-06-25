@@ -1,0 +1,1299 @@
+[
+  {
+    "id": "clean_001",
+    "doc_id": "cuad_limeenergyco-09-09-1999-ex-10-distributor-agreement",
+    "source": "cuad",
+    "contract_type": "unknown",
+    "category": "clean",
+    "objective": "Locate and extract the \"Governing Law\" clause.",
+    "expected_fields": [
+      {
+        "name": "Governing Law",
+        "value": "This Agreement is to be construed according to the laws          of the State of Illinois."
+      }
+    ],
+    "expected_flags": [
+      {
+        "playbook_id": "governing_law",
+        "severity": "low"
+      }
+    ],
+    "gold_spans": [
+      {
+        "doc_id": "cuad_limeenergyco-09-09-1999-ex-10-distributor-agreement",
+        "char_start": 52061,
+        "char_end": 52151,
+        "quote": "This Agreement is to be construed according to the laws          of the State of Illinois."
+      }
+    ],
+    "grader": "span_match",
+    "notes": "CUAD governing-law span; tests clause localization against loaded corpus"
+  },
+  {
+    "id": "clean_002",
+    "doc_id": "cuad_whitesmoke-inc-11-08-2011-ex-10-26-promotion-and-distribution-agreement",
+    "source": "cuad",
+    "contract_type": "unknown",
+    "category": "clean",
+    "objective": "Locate and extract the \"Governing Law\" clause.",
+    "expected_fields": [
+      {
+        "name": "Governing Law",
+        "value": "This Agreement is governed by English law and the parties submit to the exclusive jurisdiction of the English courts in  relation to any dispute (contractual or non-contractual) concerning this Agreement save that either party may apply to any court for an  injunction or other relief to protect its Intellectual Property Rights."
+      }
+    ],
+    "expected_flags": [
+      {
+        "playbook_id": "governing_law",
+        "severity": "low"
+      }
+    ],
+    "gold_spans": [
+      {
+        "doc_id": "cuad_whitesmoke-inc-11-08-2011-ex-10-26-promotion-and-distribution-agreement",
+        "char_start": 41315,
+        "char_end": 41644,
+        "quote": "This Agreement is governed by English law and the parties submit to the exclusive jurisdiction of the English courts in  relation to any dispute (contractual or non-contractual) concerning this Agreement save that either party may apply to any court for an  injunction or other relief to protect its Intellectual Property Rights."
+      }
+    ],
+    "grader": "span_match",
+    "notes": "CUAD governing-law span; tests clause localization against loaded corpus"
+  },
+  {
+    "id": "clean_003",
+    "doc_id": "cuad_lohacompanyltd-20191209-f-1-ex-10-16-11917878-ex-10-16-supply-agreement",
+    "source": "cuad",
+    "contract_type": "unknown",
+    "category": "clean",
+    "objective": "Locate and extract the \"Governing Law\" clause.",
+    "expected_fields": [
+      {
+        "name": "Governing Law",
+        "value": "It will be governed by the law of the People's Republic of China ,otherwise it is governed by United Nations Convention on Contract for the International Sale of Goods."
+      }
+    ],
+    "expected_flags": [
+      {
+        "playbook_id": "governing_law",
+        "severity": "low"
+      }
+    ],
+    "gold_spans": [
+      {
+        "doc_id": "cuad_lohacompanyltd-20191209-f-1-ex-10-16-11917878-ex-10-16-supply-agreement",
+        "char_start": 10691,
+        "char_end": 10859,
+        "quote": "It will be governed by the law of the People's Republic of China ,otherwise it is governed by United Nations Convention on Contract for the International Sale of Goods."
+      }
+    ],
+    "grader": "span_match",
+    "notes": "CUAD governing-law span; tests clause localization against loaded corpus"
+  },
+  {
+    "id": "clean_004",
+    "doc_id": "cuad_centrackinternationalinc-10-29-1999-ex-10-3-web-site-hosting-agreement",
+    "source": "cuad",
+    "contract_type": "unknown",
+    "category": "clean",
+    "objective": "Locate and extract the \"Governing Law\" clause.",
+    "expected_fields": [
+      {
+        "name": "Governing Law",
+        "value": "This Agreement was entered into in the State of Florida, and its validity, construction, interpretation, and legal effect shall be governed by the laws and judicial decisions of the State of Florida applicable to contracts entered into and performed entirely within the State of Florida."
+      }
+    ],
+    "expected_flags": [
+      {
+        "playbook_id": "governing_law",
+        "severity": "low"
+      }
+    ],
+    "gold_spans": [
+      {
+        "doc_id": "cuad_centrackinternationalinc-10-29-1999-ex-10-3-web-site-hosting-agreement",
+        "char_start": 14093,
+        "char_end": 14380,
+        "quote": "This Agreement was entered into in the State of Florida, and its validity, construction, interpretation, and legal effect shall be governed by the laws and judicial decisions of the State of Florida applicable to contracts entered into and performed entirely within the State of Florida."
+      }
+    ],
+    "grader": "span_match",
+    "notes": "CUAD governing-law span; tests clause localization against loaded corpus"
+  },
+  {
+    "id": "clean_005",
+    "doc_id": "cuad_adamsgolfinc-03-21-2005-ex-10-17-endorsement-agreement",
+    "source": "cuad",
+    "contract_type": "unknown",
+    "category": "clean",
+    "objective": "Locate and extract the \"Governing Law\" clause.",
+    "expected_fields": [
+      {
+        "name": "Governing Law",
+        "value": "This Agreement shall be governed and construed according to the laws of the State of Kansas."
+      }
+    ],
+    "expected_flags": [
+      {
+        "playbook_id": "governing_law",
+        "severity": "low"
+      }
+    ],
+    "gold_spans": [
+      {
+        "doc_id": "cuad_adamsgolfinc-03-21-2005-ex-10-17-endorsement-agreement",
+        "char_start": 19173,
+        "char_end": 19265,
+        "quote": "This Agreement shall be governed and construed according to the laws of the State of Kansas."
+      }
+    ],
+    "grader": "span_match",
+    "notes": "CUAD governing-law span; tests clause localization against loaded corpus"
+  },
+  {
+    "id": "clean_006",
+    "doc_id": "cuad_kiromicbiopharma-inc-05-11-2020-ex-10-23-consulting-agreement",
+    "source": "cuad",
+    "contract_type": "unknown",
+    "category": "clean",
+    "objective": "Locate and extract the \"Governing Law\" clause.",
+    "expected_fields": [
+      {
+        "name": "Governing Law",
+        "value": "This Agreement shall be governed by the laws of the State of Texas, without reference to its conflicts of law principles."
+      }
+    ],
+    "expected_flags": [
+      {
+        "playbook_id": "governing_law",
+        "severity": "low"
+      }
+    ],
+    "gold_spans": [
+      {
+        "doc_id": "cuad_kiromicbiopharma-inc-05-11-2020-ex-10-23-consulting-agreement",
+        "char_start": 12387,
+        "char_end": 12508,
+        "quote": "This Agreement shall be governed by the laws of the State of Texas, without reference to its conflicts of law principles."
+      }
+    ],
+    "grader": "span_match",
+    "notes": "CUAD governing-law span; tests clause localization against loaded corpus"
+  },
+  {
+    "id": "clean_007",
+    "doc_id": "cuad_veoneer-inc-02-21-2020-ex-10-11-joint-venture-agreement",
+    "source": "cuad",
+    "contract_type": "unknown",
+    "category": "clean",
+    "objective": "Locate and extract the \"Governing Law\" clause.",
+    "expected_fields": [
+      {
+        "name": "Governing Law",
+        "value": "This Amendment shall be governed by and construed in accordance with the laws of Japan."
+      }
+    ],
+    "expected_flags": [
+      {
+        "playbook_id": "governing_law",
+        "severity": "low"
+      }
+    ],
+    "gold_spans": [
+      {
+        "doc_id": "cuad_veoneer-inc-02-21-2020-ex-10-11-joint-venture-agreement",
+        "char_start": 6650,
+        "char_end": 6737,
+        "quote": "This Amendment shall be governed by and construed in accordance with the laws of Japan."
+      }
+    ],
+    "grader": "span_match",
+    "notes": "CUAD governing-law span; tests clause localization against loaded corpus"
+  },
+  {
+    "id": "clean_008",
+    "doc_id": "cuad_dovapharmaceuticalsinc-20181108-10-q-ex-10-2-11414857-ex-10-2-promotion-agreement",
+    "source": "cuad",
+    "contract_type": "unknown",
+    "category": "clean",
+    "objective": "Locate and extract the \"Expiration Date\" clause.",
+    "expected_fields": [
+      {
+        "name": "Expiration Date",
+        "value": "This Agreement shall become effective as of the Effective Date and, unless earlier terminated as provided in this ARTICLE 12, shall extend until the four (4) year anniversary of the Effective Date (the \"Term\")."
+      }
+    ],
+    "expected_flags": [],
+    "gold_spans": [
+      {
+        "doc_id": "cuad_dovapharmaceuticalsinc-20181108-10-q-ex-10-2-11414857-ex-10-2-promotion-agreement",
+        "char_start": 137974,
+        "char_end": 138184,
+        "quote": "This Agreement shall become effective as of the Effective Date and, unless earlier terminated as provided in this ARTICLE 12, shall extend until the four (4) year anniversary of the Effective Date (the \"Term\")."
+      }
+    ],
+    "grader": "span_match",
+    "notes": "CUAD expiration-date span; tests contract term extraction"
+  },
+  {
+    "id": "clean_009",
+    "doc_id": "cuad_pacira-pharmaceuticals-inc-a-r-strategic-licensing-distribution-and-marketing-agreement",
+    "source": "cuad",
+    "contract_type": "unknown",
+    "category": "clean",
+    "objective": "Locate and extract the \"Expiration Date\" clause.",
+    "expected_fields": [
+      {
+        "name": "Expiration Date",
+        "value": "This Agreement shall commence on the Effective Date and, subject to earlier termination in accordance with the provisions of Section 16, shall continue in force for a period being the longer of fifteen (15) years from first Commercial Launch of the Product in the Territory or until  the expiration of the last valid claim in the PPI Patents covering the Product in any country of the Territory (the \"Initial Term\")."
+      }
+    ],
+    "expected_flags": [],
+    "gold_spans": [
+      {
+        "doc_id": "cuad_pacira-pharmaceuticals-inc-a-r-strategic-licensing-distribution-and-marketing-agreement",
+        "char_start": 93722,
+        "char_end": 94138,
+        "quote": "This Agreement shall commence on the Effective Date and, subject to earlier termination in accordance with the provisions of Section 16, shall continue in force for a period being the longer of fifteen (15) years from first Commercial Launch of the Product in the Territory or until  the expiration of the last valid claim in the PPI Patents covering the Product in any country of the Territory (the \"Initial Term\")."
+      }
+    ],
+    "grader": "span_match",
+    "notes": "CUAD expiration-date span; tests contract term extraction"
+  },
+  {
+    "id": "clean_010",
+    "doc_id": "cuad_metlife-inc-remarketing-agreement",
+    "source": "cuad",
+    "contract_type": "unknown",
+    "category": "clean",
+    "objective": "Locate and extract the \"Expiration Date\" clause.",
+    "expected_fields": [
+      {
+        "name": "Expiration Date",
+        "value": "obligations of the Remarketing Agents may be terminated by them by notice given to the Company prior to 12:00 noon, New York City time on the Remarketing Settlement Date if, prior to that time, any of the applicable conditions precedent to the obligations of the Remarketing Agents described in Section 5 hereof shall have failed to occur."
+      }
+    ],
+    "expected_flags": [],
+    "gold_spans": [
+      {
+        "doc_id": "cuad_metlife-inc-remarketing-agreement",
+        "char_start": 88993,
+        "char_end": 89332,
+        "quote": "obligations of the Remarketing Agents may be terminated by them by notice given to the Company prior to 12:00 noon, New York City time on the Remarketing Settlement Date if, prior to that time, any of the applicable conditions precedent to the obligations of the Remarketing Agents described in Section 5 hereof shall have failed to occur."
+      }
+    ],
+    "grader": "span_match",
+    "notes": "CUAD expiration-date span; tests contract term extraction"
+  },
+  {
+    "id": "clean_011",
+    "doc_id": "cuad_ftenetworks-inc-02-18-2016-ex-99-4-strategic-alliance-agreement",
+    "source": "cuad",
+    "contract_type": "unknown",
+    "category": "clean",
+    "objective": "Locate and extract the \"Expiration Date\" clause.",
+    "expected_fields": [
+      {
+        "name": "Expiration Date",
+        "value": "THIS STRATEGIC ALLIANCE AGREEMENT (the \"Agreement\"), made effective this 17t h day of February 2016, through February 16, 2019 (the \"Initial Term\") i"
+      }
+    ],
+    "expected_flags": [],
+    "gold_spans": [
+      {
+        "doc_id": "cuad_ftenetworks-inc-02-18-2016-ex-99-4-strategic-alliance-agreement",
+        "char_start": 59,
+        "char_end": 208,
+        "quote": "THIS STRATEGIC ALLIANCE AGREEMENT (the \"Agreement\"), made effective this 17t h day of February 2016, through February 16, 2019 (the \"Initial Term\") i"
+      }
+    ],
+    "grader": "span_match",
+    "notes": "CUAD expiration-date span; tests contract term extraction"
+  },
+  {
+    "id": "clean_012",
+    "doc_id": "cuad_cerenceinc-20191002-8-k-ex-10-4-11827494-ex-10-4-intellectual-property-agreement",
+    "source": "cuad",
+    "contract_type": "unknown",
+    "category": "clean",
+    "objective": "Locate and extract the \"Anti-Assignment\" clause.",
+    "expected_fields": [
+      {
+        "name": "Anti-Assignment",
+        "value": "Any purported assignment without such consent shall be void."
+      }
+    ],
+    "expected_flags": [],
+    "gold_spans": [
+      {
+        "doc_id": "cuad_cerenceinc-20191002-8-k-ex-10-4-11827494-ex-10-4-intellectual-property-agreement",
+        "char_start": 38641,
+        "char_end": 38701,
+        "quote": "Any purported assignment without such consent shall be void."
+      },
+      {
+        "doc_id": "cuad_cerenceinc-20191002-8-k-ex-10-4-11827494-ex-10-4-intellectual-property-agreement",
+        "char_start": 38297,
+        "char_end": 38640,
+        "quote": "Except as expressly set forth in this Agreement, neither this Agreement nor any of the rights, interests or obligations under this Agreement, including the licenses granted pursuant to this Agreement, shall be assigned, in whole or in part, by operation of Law or otherwise by either Party without the prior written consent of the other Party."
+      }
+    ],
+    "grader": "span_match",
+    "notes": "CUAD anti-assignment span; tests restriction clause detection"
+  },
+  {
+    "id": "clean_013",
+    "doc_id": "cuad_thriventvariableinsuranceaccountb-20190701-n-6-ex-99-d-iv-11720968-ex-99-d-iv-endorsement-agreement",
+    "source": "cuad",
+    "contract_type": "unknown",
+    "category": "clean",
+    "objective": "Locate and extract the \"Anti-Assignment\" clause.",
+    "expected_fields": [
+      {
+        "name": "Anti-Assignment",
+        "value": "Society membership rights and privileges cannot be transferred or assigned."
+      }
+    ],
+    "expected_flags": [],
+    "gold_spans": [
+      {
+        "doc_id": "cuad_thriventvariableinsuranceaccountb-20190701-n-6-ex-99-d-iv-11720968-ex-99-d-iv-endorsement-agreement",
+        "char_start": 4016,
+        "char_end": 4091,
+        "quote": "Society membership rights and privileges cannot be transferred or assigned."
+      }
+    ],
+    "grader": "span_match",
+    "notes": "CUAD anti-assignment span; tests restriction clause detection"
+  },
+  {
+    "id": "clean_014",
+    "doc_id": "cuad_reynoldsconsumerproductsinc-20191115-s-1-ex-10-18-11896469-ex-10-18-supply-agreement",
+    "source": "cuad",
+    "contract_type": "unknown",
+    "category": "clean",
+    "objective": "Locate and extract the \"Anti-Assignment\" clause.",
+    "expected_fields": [
+      {
+        "name": "Anti-Assignment",
+        "value": "A change of control shall be deemed an assignment requiring consent hereunder provided that any transfer or assignment that results in Seller's and Buyer's current common parent, Reynolds Group Holdings Limited, ceasing to control either party shall not require consent of the other party."
+      }
+    ],
+    "expected_flags": [],
+    "gold_spans": [
+      {
+        "doc_id": "cuad_reynoldsconsumerproductsinc-20191115-s-1-ex-10-18-11896469-ex-10-18-supply-agreement",
+        "char_start": 54581,
+        "char_end": 54870,
+        "quote": "A change of control shall be deemed an assignment requiring consent hereunder provided that any transfer or assignment that results in Seller's and Buyer's current common parent, Reynolds Group Holdings Limited, ceasing to control either party shall not require consent of the other party."
+      },
+      {
+        "doc_id": "cuad_reynoldsconsumerproductsinc-20191115-s-1-ex-10-18-11896469-ex-10-18-supply-agreement",
+        "char_start": 53638,
+        "char_end": 53884,
+        "quote": "This Agreement, its rights and obligations, is not assignable or transferable by either Party, in whole or in part, except with the prior written consent of the other Party, which consent will not be unreasonably withheld, conditioned or delayed."
+      }
+    ],
+    "grader": "span_match",
+    "notes": "CUAD anti-assignment span; tests restriction clause detection"
+  },
+  {
+    "id": "clean_015",
+    "doc_id": "cuad_dominiadvisortrust-02-18-2005-ex-99-h-2-sponsorship-agreement",
+    "source": "cuad",
+    "contract_type": "unknown",
+    "category": "clean",
+    "objective": "Locate and extract the \"Cap On Liability\" clause.",
+    "expected_fields": [
+      {
+        "name": "Cap On Liability",
+        "value": "Limitation of Liability of the Sponsor."
+      }
+    ],
+    "expected_flags": [],
+    "gold_spans": [
+      {
+        "doc_id": "cuad_dominiadvisortrust-02-18-2005-ex-99-h-2-sponsorship-agreement",
+        "char_start": 7252,
+        "char_end": 7291,
+        "quote": "Limitation of Liability of the Sponsor."
+      }
+    ],
+    "grader": "span_match",
+    "notes": "CUAD cap-on-liability span; tests financial limit extraction"
+  },
+  {
+    "id": "clean_016",
+    "doc_id": "cuad_intriconcorp-03-10-2009-ex-10-22-strategic-alliance-agreement",
+    "source": "cuad",
+    "contract_type": "unknown",
+    "category": "clean",
+    "objective": "Locate and extract the \"Cap On Liability\" clause.",
+    "expected_fields": [
+      {
+        "name": "Cap On Liability",
+        "value": "IntriCon is not liable in any way to Dynamic Hearing for any indirect, consequential, third party, special or incidental  harm, liability, expense, cost, loss or damage, loss of profits, loss of data, exemplary damages or any other indirect  commercial or economic loss of any kind whatsoever incurred by Dynamic Hearing whether in negligence, tort, equity,  contract or otherwise, arising in connection with this Agreement;"
+      }
+    ],
+    "expected_flags": [],
+    "gold_spans": [
+      {
+        "doc_id": "cuad_intriconcorp-03-10-2009-ex-10-22-strategic-alliance-agreement",
+        "char_start": 35924,
+        "char_end": 36348,
+        "quote": "IntriCon is not liable in any way to Dynamic Hearing for any indirect, consequential, third party, special or incidental  harm, liability, expense, cost, loss or damage, loss of profits, loss of data, exemplary damages or any other indirect  commercial or economic loss of any kind whatsoever incurred by Dynamic Hearing whether in negligence, tort, equity,  contract or otherwise, arising in connection with this Agreement;"
+      },
+      {
+        "doc_id": "cuad_intriconcorp-03-10-2009-ex-10-22-strategic-alliance-agreement",
+        "char_start": 37021,
+        "char_end": 37279,
+        "quote": "(i)    if the breach relates to goods:\n\n          (A)    the replacement of goods or the supply of equivalent goods; or\n\n          (B)    the repair of such goods; and\n\n          (ii)    if the breach relates to services: the supplying of the services again."
+      },
+      {
+        "doc_id": "cuad_intriconcorp-03-10-2009-ex-10-22-strategic-alliance-agreement",
+        "char_start": 35495,
+        "char_end": 35912,
+        "quote": "Dynamic Hearing is not liable in any way to IntriCon for any indirect, consequential, third party, special or incidental  harm, liability, expense, cost, loss or damage, loss of profits, loss of data, exemplary damages or any other indirect  commercial or economic loss of any kind whatsoever incurred by IntriCon whether in negligence, tort, equity, contract  or otherwise, arising in connection with this Agreement;"
+      },
+      {
+        "doc_id": "cuad_intriconcorp-03-10-2009-ex-10-22-strategic-alliance-agreement",
+        "char_start": 36360,
+        "char_end": 36719,
+        "quote": "Dynamic Hearing's aggregate liability to IntriCon for direct loss and damages and all other liability not described herein  arising in connection with this Agreement whether in negligence, tort, equity, contract or otherwise, is limited to  payment of damages recoverable at law or equity up to a maximum of (and, for the sake of clarity must not exceed) $5m;"
+      },
+      {
+        "doc_id": "cuad_intriconcorp-03-10-2009-ex-10-22-strategic-alliance-agreement",
+        "char_start": 36736,
+        "char_end": 36999,
+        "quote": "if any legislation implies in this Agreement any term or warranty which cannot be excluded or modified, the liability of  Dynamic Hearing for a breach of any such term or warranty is limited, at the option of Dynamic Hearing, to any one or  more of the following:"
+      }
+    ],
+    "grader": "span_match",
+    "notes": "CUAD cap-on-liability span; tests financial limit extraction"
+  },
+  {
+    "id": "clean_017",
+    "doc_id": "cuad_operaltd-04-30-2020-ex-4-14-service-agreement",
+    "source": "cuad",
+    "contract_type": "unknown",
+    "category": "clean",
+    "objective": "Locate and extract the \"Cap On Liability\" clause.",
+    "expected_fields": [
+      {
+        "name": "Cap On Liability",
+        "value": "Neither Party shall be liable to the other Party in contract, tort or otherwise, whatever the cause, for any loss of profit, business or goodwill or any indirect, incidental or consequential costs, damages or expenses of any kind, except for such loss attributable to breach of confidentiality."
+      }
+    ],
+    "expected_flags": [],
+    "gold_spans": [
+      {
+        "doc_id": "cuad_operaltd-04-30-2020-ex-4-14-service-agreement",
+        "char_start": 15646,
+        "char_end": 15940,
+        "quote": "Neither Party shall be liable to the other Party in contract, tort or otherwise, whatever the cause, for any loss of profit, business or goodwill or any indirect, incidental or consequential costs, damages or expenses of any kind, except for such loss attributable to breach of confidentiality."
+      },
+      {
+        "doc_id": "cuad_operaltd-04-30-2020-ex-4-14-service-agreement",
+        "char_start": 18229,
+        "char_end": 18646,
+        "quote": "IN NO EVENT WILL EITHER PARTY BE LIABLE FOR ANY CONSEQUENTIAL, INDIRECT, EXEMPLARY, SPECIAL, OR INCIDENTAL DAMAGES ARISING FROM OR RELATING TO THIS AGREEMENT. NEITHER PARTIES' TOTAL CUMULATIVE LIABILITY IN CONNECTION WITH THIS AGREEMENT, WHETHER IN AGREEMENT OR TORT OR OTHERWISE, WILL NOT EXCEED THE AGGREGATE AMOUNT OF FEES AND EXPENSES OWED BY PC FINANCIAL TO MOBIMAGIC FOR SERVICES PERFORMED UNDER THIS AGREEMENT."
+      },
+      {
+        "doc_id": "cuad_operaltd-04-30-2020-ex-4-14-service-agreement",
+        "char_start": 8238,
+        "char_end": 8607,
+        "quote": "Subject to the foregoing as wen as Mobimagic's obligations under this Agreement, Mobimagic shall not in any manner be held or be responsible or liable for any unforeseen contingency, claims, liabilities, demands. losses, damages or expenses arising due to absence of storage or retention of any PC Financial data which shall be the sole responsibility of PC Financial ."
+      }
+    ],
+    "grader": "span_match",
+    "notes": "CUAD cap-on-liability span; tests financial limit extraction"
+  },
+  {
+    "id": "clean_018",
+    "doc_id": "cuad_bontonstoresinc-04-20-2018-ex-99-3-agency-agreement",
+    "source": "cuad",
+    "contract_type": "unknown",
+    "category": "clean",
+    "objective": "Locate and extract the \"Post-Termination Services\" clause.",
+    "expected_fields": [
+      {
+        "name": "Post-Termination Services",
+        "value": "To the extent that there is Merchandise remaining at the Sale Termination Date (the \"Remaining Merchandise\"), such Remaining Merchandise shall be deemed automatically transferred to Agent free and clear of all liens, claims, and encumbrances. Agent and its affiliates shall be authorized to sell or otherwise dispose of the Remaining Merchandise with all logos, brand names, and other Intellectual Property intact, and shall be authorized to advertise the sale of the Remaining Merchandise using the Intellectual Property."
+      }
+    ],
+    "expected_flags": [
+      {
+        "playbook_id": "return_of_materials",
+        "severity": "low"
+      }
+    ],
+    "gold_spans": [
+      {
+        "doc_id": "cuad_bontonstoresinc-04-20-2018-ex-99-3-agency-agreement",
+        "char_start": 36330,
+        "char_end": 36852,
+        "quote": "To the extent that there is Merchandise remaining at the Sale Termination Date (the \"Remaining Merchandise\"), such Remaining Merchandise shall be deemed automatically transferred to Agent free and clear of all liens, claims, and encumbrances. Agent and its affiliates shall be authorized to sell or otherwise dispose of the Remaining Merchandise with all logos, brand names, and other Intellectual Property intact, and shall be authorized to advertise the sale of the Remaining Merchandise using the Intellectual Property."
+      }
+    ],
+    "grader": "span_match",
+    "notes": "CUAD post-termination-services span; tests post-term obligation extraction"
+  },
+  {
+    "id": "clean_019",
+    "doc_id": "cuad_chinarealestateinformationcorp-20090929-f-1-ex-10-32-4771615-ex-10-32-content-license-agreement",
+    "source": "cuad",
+    "contract_type": "unknown",
+    "category": "clean",
+    "objective": "Locate and extract the \"Post-Termination Services\" clause.",
+    "expected_fields": [
+      {
+        "name": "Post-Termination Services",
+        "value": "Upon termination (but not expiration) of this Agreement for any reason, Licensee shall be entitled to use the Licensed Domain Names and  Licensed Content for a limited period of time, not to exceed ninety (90) days, during which it shall diligently work to transition to another solution."
+      }
+    ],
+    "expected_flags": [
+      {
+        "playbook_id": "return_of_materials",
+        "severity": "low"
+      }
+    ],
+    "gold_spans": [
+      {
+        "doc_id": "cuad_chinarealestateinformationcorp-20090929-f-1-ex-10-32-4771615-ex-10-32-content-license-agreement",
+        "char_start": 23829,
+        "char_end": 24117,
+        "quote": "Upon termination (but not expiration) of this Agreement for any reason, Licensee shall be entitled to use the Licensed Domain Names and  Licensed Content for a limited period of time, not to exceed ninety (90) days, during which it shall diligently work to transition to another solution."
+      }
+    ],
+    "grader": "span_match",
+    "notes": "CUAD post-termination-services span; tests post-term obligation extraction"
+  },
+  {
+    "id": "clean_020",
+    "doc_id": "cuad_pfhospitalitygroupinc-20150923-10-12g-ex-10-1-9266710-ex-10-1-franchise-agreement3",
+    "source": "cuad",
+    "contract_type": "unknown",
+    "category": "clean",
+    "objective": "Locate and extract the \"Non-Compete\" clause.",
+    "expected_fields": [
+      {
+        "name": "Non-Compete",
+        "value": "Member covenants and agrees that during the Post-Term Period (defined below), except as otherwise approved in writing by Franchisor, Member shall not, either directly or indirectly, own, manage, engage in, be employed by, advise, make loans to, consult for, or have any other interest in any Competitive Business that is, or intends to operate, within a three (3) mile radius of the premises of your Franchised Business or within a three (3) mile radius of any Franchised Business then-operating or under construction to operate under the System."
+      }
+    ],
+    "expected_flags": [],
+    "gold_spans": [
+      {
+        "doc_id": "cuad_pfhospitalitygroupinc-20150923-10-12g-ex-10-1-9266710-ex-10-1-franchise-agreement3",
+        "char_start": 3500,
+        "char_end": 4046,
+        "quote": "Member covenants and agrees that during the Post-Term Period (defined below), except as otherwise approved in writing by Franchisor, Member shall not, either directly or indirectly, own, manage, engage in, be employed by, advise, make loans to, consult for, or have any other interest in any Competitive Business that is, or intends to operate, within a three (3) mile radius of the premises of your Franchised Business or within a three (3) mile radius of any Franchised Business then-operating or under construction to operate under the System."
+      },
+      {
+        "doc_id": "cuad_pfhospitalitygroupinc-20150923-10-12g-ex-10-1-9266710-ex-10-1-franchise-agreement3",
+        "char_start": 2504,
+        "char_end": 3218,
+        "quote": "Member covenants and agrees that during the term of the Franchise Agreement, except as otherwise approved in writing by Franchisor, Member shall not, either directly or indirectly, for itself, or through, on behalf of, or in conjunction with any person, persons, partnership, corporation, or entity: (i) Own, manage, engage in, be employed by, advise, make loans to, consult for, rent or lease to, or have any other interest in business that (directly or indirectly) operates, or grants franchises or licenses to operate, a restaurant featuring pizza and related food specialties or that offers products or services substantially similar to those then offered by Pizza Fusions Restaurants (\"Competitive Business\");"
+      }
+    ],
+    "grader": "span_match",
+    "notes": "CUAD non-compete span; tests restrictive covenant localization"
+  },
+  {
+    "id": "clean_021",
+    "doc_id": "cuad_hertzglobalholdings-inc-07-07-2016-ex-10-4-intellectual-property-agreement",
+    "source": "cuad",
+    "contract_type": "unknown",
+    "category": "clean",
+    "objective": "Locate and extract the \"Non-Compete\" clause.",
+    "expected_fields": [
+      {
+        "name": "Non-Compete",
+        "value": "During the Interim Period, neither HERC nor any of its affiliates or subsidiaries shall, directly or indirectly, engage in the business of renting or leasing cars, crossovers or light trucks (including sport utility vehicles and light commercial vehicles) in [any country in which THC or any of its affiliates or subsidiaries rents or leases cars, crossovers or light trucks (including sport utility vehicles and light commercial vehicles) as of the date of this Agreement] without THC's prior written consent, except to the extent materially consistent in type and scope with HERC's operations immediately prior to the date of this IPA."
+      }
+    ],
+    "expected_flags": [],
+    "gold_spans": [
+      {
+        "doc_id": "cuad_hertzglobalholdings-inc-07-07-2016-ex-10-4-intellectual-property-agreement",
+        "char_start": 23766,
+        "char_end": 24403,
+        "quote": "During the Interim Period, neither HERC nor any of its affiliates or subsidiaries shall, directly or indirectly, engage in the business of renting or leasing cars, crossovers or light trucks (including sport utility vehicles and light commercial vehicles) in [any country in which THC or any of its affiliates or subsidiaries rents or leases cars, crossovers or light trucks (including sport utility vehicles and light commercial vehicles) as of the date of this Agreement] without THC's prior written consent, except to the extent materially consistent in type and scope with HERC's operations immediately prior to the date of this IPA."
+      }
+    ],
+    "grader": "span_match",
+    "notes": "CUAD non-compete span; tests restrictive covenant localization"
+  },
+  {
+    "id": "clean_022",
+    "doc_id": "cuad_pfhospitalitygroupinc-20150923-10-12g-ex-10-1-9266710-ex-10-1-franchise-agreement1",
+    "source": "cuad",
+    "contract_type": "unknown",
+    "category": "clean",
+    "objective": "Locate and extract the \"Non-Compete\" clause.",
+    "expected_fields": [
+      {
+        "name": "Non-Compete",
+        "value": "You agree that during the term of this Agreement, you will not, without our prior written consent, either directly or indirectly through any other person or entity:"
+      }
+    ],
+    "expected_flags": [],
+    "gold_spans": [
+      {
+        "doc_id": "cuad_pfhospitalitygroupinc-20150923-10-12g-ex-10-1-9266710-ex-10-1-franchise-agreement1",
+        "char_start": 134045,
+        "char_end": 134209,
+        "quote": "You agree that during the term of this Agreement, you will not, without our prior written consent, either directly or indirectly through any other person or entity:"
+      },
+      {
+        "doc_id": "cuad_pfhospitalitygroupinc-20150923-10-12g-ex-10-1-9266710-ex-10-1-franchise-agreement1",
+        "char_start": 134283,
+        "char_end": 135032,
+        "quote": "17.1.1. Own, manage, engage in, be employed by, advise, make loans to, consult for, rent or lease to, or have any other interest in any business that (directly or indirectly) operates, or grants franchises or licenses to operate, a restaurant featuring pizza and related food specialties or that offers products or services substantially similar to those then offered by Restaurants (\"Competitive Business\"); 17.1.2. Divert or attempt to divert any business or customer, or potential business or customer, to any Competitive Business; or 17.1.3. Induce any person to leave his or her employment with us. 17.1.4. In any manner interfere with, disturb, disrupt, impair, diminish, or otherwise jeopardize our business or that of any of our franchisees."
+      },
+      {
+        "doc_id": "cuad_pfhospitalitygroupinc-20150923-10-12g-ex-10-1-9266710-ex-10-1-franchise-agreement1",
+        "char_start": 7441,
+        "char_end": 7687,
+        "quote": "You agree not to: (a) advertise or market the services of your Franchised Business outside of the Delivery/Catering and Advertising Area; and/or (b) engage in direct solicitation of customers outside of the Delivery/Catering and Advertising Area."
+      },
+      {
+        "doc_id": "cuad_pfhospitalitygroupinc-20150923-10-12g-ex-10-1-9266710-ex-10-1-franchise-agreement1",
+        "char_start": 6235,
+        "char_end": 6682,
+        "quote": "Without our prior written approval, you may not engage in any other type of sale, including, but not limited to: selling, distributing, or otherwise providing, any services or products to third parties at wholesale, or for resale or distribution by any third party; and selling, distributing or otherwise providing any products and/or services through catalogs, mail order, toll free numbers for delivery, or electronic means (e.g., the Internet)."
+      },
+      {
+        "doc_id": "cuad_pfhospitalitygroupinc-20150923-10-12g-ex-10-1-9266710-ex-10-1-franchise-agreement1",
+        "char_start": 7951,
+        "char_end": 8288,
+        "quote": "If any of your advertising within the Delivery/Catering and Advertising Area is in media that will or may reach a significant number of persons outside of the Delivery/Catering and Advertising Area, you must notify us in advance and obtain our prior written consent (in addition to the requirements in Section 9.3 [Regional Fund] below)."
+      },
+      {
+        "doc_id": "cuad_pfhospitalitygroupinc-20150923-10-12g-ex-10-1-9266710-ex-10-1-franchise-agreement1",
+        "char_start": 135083,
+        "char_end": 135680,
+        "quote": "For two (2) years after the expiration or termination of this Agreement or an approved Transfer to a new franchisee, you may not directly or indirectly own, manage, engage in, be employed by, advise, make loans to, consult for, or have any other interest in any Competitive Business that is, or intends to operate, within three (3) mile radius of the Premises of your Franchised Business or within a three (3) mile radius of any Restaurant then-operating or under construction to operate under the System, except as permitted by any Franchise Agreements that remain in effect between you and us. ."
+      },
+      {
+        "doc_id": "cuad_pfhospitalitygroupinc-20150923-10-12g-ex-10-1-9266710-ex-10-1-franchise-agreement1",
+        "char_start": 12297,
+        "char_end": 12451,
+        "quote": "You agree not to engage in any of the sales activities that we have reserved to ourselves in Sections 1.3 [Our Limitations and Our Reserved Rights] above."
+      }
+    ],
+    "grader": "span_match",
+    "notes": "CUAD non-compete span; tests restrictive covenant localization"
+  },
+  {
+    "id": "deviated_023",
+    "doc_id": "contractnli_1",
+    "source": "contractnli",
+    "contract_type": "nda",
+    "category": "deviated",
+    "objective": "Assess the hypothesis: Receiving Party shall destroy or return some Confidential Information upon the termination of Agreement.",
+    "expected_fields": [],
+    "expected_flags": [
+      {
+        "playbook_id": "return_of_materials",
+        "severity": "high"
+      }
+    ],
+    "gold_spans": [
+      {
+        "doc_id": "contractnli_1",
+        "char_start": 12366,
+        "char_end": 12998,
+        "quote": "The Recipient shall immediately return and redeliver to the other all tangible material embodying the JEA Confidential Information provided hereunder and all notes, summaries, memoranda, drawings, manuals, records, excerpts or derivative information deriving there from and all other documents or materials (\"Notes\") (and all copies of any of the foregoing, including \"copies\" that have been converted to computerized media in the form of image, data or word processing files either manually or by image capture) based on or including any JEA Confidential Information, in whatever form of storage or retrieval, upon the earlier of -"
+      },
+      {
+        "doc_id": "contractnli_1",
+        "char_start": 12999,
+        "char_end": 13094,
+        "quote": "I. the completion or termination of the dealings between the parties contemplated hereunder; or"
+      },
+      {
+        "doc_id": "contractnli_1",
+        "char_start": 13095,
+        "char_end": 13136,
+        "quote": "II. the termination of this Agreement; or"
+      }
+    ],
+    "grader": "flag_match",
+    "notes": "ContractNLI annotation: clause present but deviates from standard NDA position (return_of_materials)"
+  },
+  {
+    "id": "deviated_024",
+    "doc_id": "contractnli_2",
+    "source": "contractnli",
+    "contract_type": "nda",
+    "category": "deviated",
+    "objective": "Assess the hypothesis: Receiving Party shall not reverse engineer any objects which embody Disclosing Party's Confidential Information.",
+    "expected_fields": [],
+    "expected_flags": [
+      {
+        "playbook_id": "exclusions",
+        "severity": "high"
+      }
+    ],
+    "gold_spans": [
+      {
+        "doc_id": "contractnli_2",
+        "char_start": 3305,
+        "char_end": 3717,
+        "quote": "Recipient shall not without Disclosing Party\u2019s prior written consent reverse engineer, disassemble or decompile any prototypes, software or other objects which embody the Disclosing Party\u2019s Confidential Information to obtain access to Disclosing Party\u2019s trade secrets and to the extent such consent is granted Recipient shall receive and hold such Confidential Information subject to the terms of this Agreement."
+      }
+    ],
+    "grader": "flag_match",
+    "notes": "ContractNLI annotation: clause present but deviates from standard NDA position (exclusions)"
+  },
+  {
+    "id": "deviated_025",
+    "doc_id": "contractnli_4",
+    "source": "contractnli",
+    "contract_type": "nda",
+    "category": "deviated",
+    "objective": "Assess the hypothesis: Agreement shall not grant Receiving Party any right to Confidential Information.",
+    "expected_fields": [],
+    "expected_flags": [
+      {
+        "playbook_id": "definition_scope",
+        "severity": "medium"
+      }
+    ],
+    "gold_spans": [
+      {
+        "doc_id": "contractnli_4",
+        "char_start": 1615,
+        "char_end": 1868,
+        "quote": "7. Neither this Agreement nor the supply of any information grants the Recipient any licence, interest or right in respect of any intellectual property rights of the Discloser except the right to copy the Confidential Information solely for the Purpose."
+      }
+    ],
+    "grader": "flag_match",
+    "notes": "ContractNLI annotation: clause present but deviates from standard NDA position (definition_scope)"
+  },
+  {
+    "id": "deviated_026",
+    "doc_id": "contractnli_5",
+    "source": "contractnli",
+    "contract_type": "nda",
+    "category": "deviated",
+    "objective": "Assess the hypothesis: Receiving Party may share some Confidential Information with some third-parties (including consultants, agents and professional advisors).",
+    "expected_fields": [],
+    "expected_flags": [
+      {
+        "playbook_id": "exclusions",
+        "severity": "high"
+      }
+    ],
+    "gold_spans": [
+      {
+        "doc_id": "contractnli_5",
+        "char_start": 621,
+        "char_end": 882,
+        "quote": "The Disclosee will procure that prior to the disclosure to any other person (including any professional advisor) of any Confidential Information, such other person is made aware of the provisions of this Agreement and the fact that the Disclosee will be liable."
+      }
+    ],
+    "grader": "flag_match",
+    "notes": "ContractNLI annotation: clause present but deviates from standard NDA position (exclusions)"
+  },
+  {
+    "id": "deviated_027",
+    "doc_id": "contractnli_6",
+    "source": "contractnli",
+    "contract_type": "nda",
+    "category": "deviated",
+    "objective": "Assess the hypothesis: Receiving Party shall destroy or return some Confidential Information upon the termination of Agreement.",
+    "expected_fields": [],
+    "expected_flags": [
+      {
+        "playbook_id": "return_of_materials",
+        "severity": "high"
+      }
+    ],
+    "gold_spans": [
+      {
+        "doc_id": "contractnli_6",
+        "char_start": 6236,
+        "char_end": 6495,
+        "quote": "In the event this Agreement is terminated, and the Disclosing Party so requests, the Receiving Party shall promptly return or destroy (and certify destruction of) all Confidential Information which it received from the Disclosing Party along with all copies. "
+      }
+    ],
+    "grader": "flag_match",
+    "notes": "ContractNLI annotation: clause present but deviates from standard NDA position (return_of_materials)"
+  },
+  {
+    "id": "deviated_028",
+    "doc_id": "contractnli_8",
+    "source": "contractnli",
+    "contract_type": "nda",
+    "category": "deviated",
+    "objective": "Assess the hypothesis: Confidential Information shall only include technical information.",
+    "expected_fields": [],
+    "expected_flags": [
+      {
+        "playbook_id": "definition_scope",
+        "severity": "medium"
+      }
+    ],
+    "gold_spans": [
+      {
+        "doc_id": "contractnli_8",
+        "char_start": 288,
+        "char_end": 653,
+        "quote": "WHEREAS the Discloser possesses certain information relating to the security set-up, security architecture, lay-out, security processes and procedures, designs, drawings, software and hardware configuration, computer programs, algorithms, services, customers etc that is confidential and proprietary in nature (hereinafter called as \"Confidential Information\"); and"
+      }
+    ],
+    "grader": "flag_match",
+    "notes": "ContractNLI annotation: clause present but deviates from standard NDA position (definition_scope)"
+  },
+  {
+    "id": "deviated_029",
+    "doc_id": "contractnli_11",
+    "source": "contractnli",
+    "contract_type": "nda",
+    "category": "deviated",
+    "objective": "Assess the hypothesis: Receiving Party shall destroy or return some Confidential Information upon the termination of Agreement.",
+    "expected_fields": [],
+    "expected_flags": [
+      {
+        "playbook_id": "return_of_materials",
+        "severity": "high"
+      }
+    ],
+    "gold_spans": [
+      {
+        "doc_id": "contractnli_11",
+        "char_start": 7538,
+        "char_end": 7737,
+        "quote": "Upon the request of VIDAR or the termination or expiration of this Confidential Agreement, Receiver shall promptly return to VIDAR all copies of the Confidential Information and obtained by Receiver."
+      }
+    ],
+    "grader": "flag_match",
+    "notes": "ContractNLI annotation: clause present but deviates from standard NDA position (return_of_materials)"
+  },
+  {
+    "id": "deviated_030",
+    "doc_id": "contractnli_18",
+    "source": "contractnli",
+    "contract_type": "nda",
+    "category": "deviated",
+    "objective": "Assess the hypothesis: Confidential Information shall only include technical information.",
+    "expected_fields": [],
+    "expected_flags": [
+      {
+        "playbook_id": "definition_scope",
+        "severity": "medium"
+      }
+    ],
+    "gold_spans": [
+      {
+        "doc_id": "contractnli_18",
+        "char_start": 935,
+        "char_end": 1318,
+        "quote": "I acknowledge that The Business Partnership has provided, and/or has agreed to provide in the future, to me information of a confidential or proprietary nature (the Confidential Information) Confidential Information shall mean any information or data relating to any clients of The Business Partnership business or affairs disclosed whether in writing, orally or by any other means. "
+      }
+    ],
+    "grader": "flag_match",
+    "notes": "ContractNLI annotation: clause present but deviates from standard NDA position (definition_scope)"
+  },
+  {
+    "id": "deviated_031",
+    "doc_id": "contractnli_21",
+    "source": "contractnli",
+    "contract_type": "nda",
+    "category": "deviated",
+    "objective": "Assess the hypothesis: Agreement shall not grant Receiving Party any right to Confidential Information.",
+    "expected_fields": [],
+    "expected_flags": [
+      {
+        "playbook_id": "definition_scope",
+        "severity": "medium"
+      }
+    ],
+    "gold_spans": [
+      {
+        "doc_id": "contractnli_21",
+        "char_start": 6437,
+        "char_end": 6688,
+        "quote": "6.2. Nothing in this Agreement shall be interpreted as a grant, by the Disclosing Party, of any license, title, interest or proprietary right to the Receiving Party in the Disclosing Party\u2019s Confidential Information or its products embodying the same."
+      }
+    ],
+    "grader": "flag_match",
+    "notes": "ContractNLI annotation: clause present but deviates from standard NDA position (definition_scope)"
+  },
+  {
+    "id": "deviated_032",
+    "doc_id": "contractnli_22",
+    "source": "contractnli",
+    "contract_type": "nda",
+    "category": "deviated",
+    "objective": "Assess the hypothesis: Agreement shall not grant Receiving Party any right to Confidential Information.",
+    "expected_fields": [],
+    "expected_flags": [
+      {
+        "playbook_id": "definition_scope",
+        "severity": "medium"
+      }
+    ],
+    "gold_spans": [
+      {
+        "doc_id": "contractnli_22",
+        "char_start": 4509,
+        "char_end": 4653,
+        "quote": "The Receiving Party shall under no circumstances obtain any right in the Disclosing Party's patents, trademark or know-how by reason of the NDA."
+      }
+    ],
+    "grader": "flag_match",
+    "notes": "ContractNLI annotation: clause present but deviates from standard NDA position (definition_scope)"
+  },
+  {
+    "id": "deviated_033",
+    "doc_id": "contractnli_23",
+    "source": "contractnli",
+    "contract_type": "nda",
+    "category": "deviated",
+    "objective": "Assess the hypothesis: Agreement shall not grant Receiving Party any right to Confidential Information.",
+    "expected_fields": [],
+    "expected_flags": [
+      {
+        "playbook_id": "definition_scope",
+        "severity": "medium"
+      }
+    ],
+    "gold_spans": [
+      {
+        "doc_id": "contractnli_23",
+        "char_start": 7356,
+        "char_end": 7609,
+        "quote": "5.3.2. The disclosure of Confidential Information to Recipient or its Representatives shall not give Recipient or its Representatives any licence or other rights in relation to that Confidential Information beyond the rights contained in this Agreement."
+      }
+    ],
+    "grader": "flag_match",
+    "notes": "ContractNLI annotation: clause present but deviates from standard NDA position (definition_scope)"
+  },
+  {
+    "id": "deviated_034",
+    "doc_id": "contractnli_24",
+    "source": "contractnli",
+    "contract_type": "nda",
+    "category": "deviated",
+    "objective": "Assess the hypothesis: Agreement shall not grant Receiving Party any right to Confidential Information.",
+    "expected_fields": [],
+    "expected_flags": [
+      {
+        "playbook_id": "definition_scope",
+        "severity": "medium"
+      }
+    ],
+    "gold_spans": [
+      {
+        "doc_id": "contractnli_24",
+        "char_start": 2802,
+        "char_end": 3062,
+        "quote": "The disclosure of Con\ufb01dential Information by the Disclosing Party to the Receiving Party shall in no way be construed to imply any transfer of rights connected with the Con\ufb01dential Information including, without limitation, any trade marks or business secrets."
+      }
+    ],
+    "grader": "flag_match",
+    "notes": "ContractNLI annotation: clause present but deviates from standard NDA position (definition_scope)"
+  },
+  {
+    "id": "deviated_035",
+    "doc_id": "contractnli_25",
+    "source": "contractnli",
+    "contract_type": "nda",
+    "category": "deviated",
+    "objective": "Assess the hypothesis: Agreement shall not grant Receiving Party any right to Confidential Information.",
+    "expected_fields": [],
+    "expected_flags": [
+      {
+        "playbook_id": "definition_scope",
+        "severity": "medium"
+      }
+    ],
+    "gold_spans": [
+      {
+        "doc_id": "contractnli_25",
+        "char_start": 4019,
+        "char_end": 4221,
+        "quote": "The Information, relating to the other party, shall remain the property of such other party (as Disclosing Party) and its disclosure shall not confer on the other party (as Receiving Party) any rights. "
+      }
+    ],
+    "grader": "flag_match",
+    "notes": "ContractNLI annotation: clause present but deviates from standard NDA position (definition_scope)"
+  },
+  {
+    "id": "deviated_036",
+    "doc_id": "contractnli_26",
+    "source": "contractnli",
+    "contract_type": "nda",
+    "category": "deviated",
+    "objective": "Assess the hypothesis: Agreement shall not grant Receiving Party any right to Confidential Information.",
+    "expected_fields": [],
+    "expected_flags": [
+      {
+        "playbook_id": "definition_scope",
+        "severity": "medium"
+      }
+    ],
+    "gold_spans": [
+      {
+        "doc_id": "contractnli_26",
+        "char_start": 4354,
+        "char_end": 4695,
+        "quote": "The furnishing of any CONFIDENTIAL INFORMATION hereunder shall not be construed as the granting of a license under any patent, patent application, copyright, copyright registration, trade secret or other proprietary right by the DISCLOSING PARTY to any person or entity or as implying any obligation other than is specifically stated herein."
+      }
+    ],
+    "grader": "flag_match",
+    "notes": "ContractNLI annotation: clause present but deviates from standard NDA position (definition_scope)"
+  },
+  {
+    "id": "deviated_037",
+    "doc_id": "contractnli_30",
+    "source": "contractnli",
+    "contract_type": "nda",
+    "category": "deviated",
+    "objective": "Assess the hypothesis: Agreement shall not grant Receiving Party any right to Confidential Information.",
+    "expected_fields": [],
+    "expected_flags": [
+      {
+        "playbook_id": "definition_scope",
+        "severity": "medium"
+      }
+    ],
+    "gold_spans": [
+      {
+        "doc_id": "contractnli_30",
+        "char_start": 11210,
+        "char_end": 11336,
+        "quote": "All Confidential Information disclosed by the Disclosing Party to the Receiving Party is acknowledged by the Receiving Party \u2013"
+      },
+      {
+        "doc_id": "contractnli_30",
+        "char_start": 11388,
+        "char_end": 11491,
+        "quote": "4.2 not to confer any rights to the Receiving Party of whatever nature in the Confidential Information."
+      }
+    ],
+    "grader": "flag_match",
+    "notes": "ContractNLI annotation: clause present but deviates from standard NDA position (definition_scope)"
+  },
+  {
+    "id": "missing_038",
+    "doc_id": "contractnli_2",
+    "source": "contractnli",
+    "contract_type": "nda",
+    "category": "missing",
+    "objective": "Determine whether this NDA contains a clause addressing: \"Receiving Party shall not use any Confidential Information for any purpose other than the purposes stated in Agreement.\" (playbook requires mutuality)",
+    "expected_fields": [],
+    "expected_flags": [
+      {
+        "playbook_id": "mutuality",
+        "severity": "medium"
+      }
+    ],
+    "gold_spans": [],
+    "grader": "flag_match",
+    "notes": "No mutual use restriction found; mutuality clause absent"
+  },
+  {
+    "id": "missing_039",
+    "doc_id": "contractnli_4",
+    "source": "contractnli",
+    "contract_type": "nda",
+    "category": "missing",
+    "objective": "Determine whether this NDA contains a clause addressing: \"Receiving Party shall destroy or return some Confidential Information upon the termination of Agreement.\" (playbook requires return_of_materials)",
+    "expected_fields": [],
+    "expected_flags": [
+      {
+        "playbook_id": "return_of_materials",
+        "severity": "low"
+      }
+    ],
+    "gold_spans": [],
+    "grader": "flag_match",
+    "notes": "No return-or-destroy clause found; required clause absent"
+  },
+  {
+    "id": "missing_040",
+    "doc_id": "contractnli_5",
+    "source": "contractnli",
+    "contract_type": "nda",
+    "category": "missing",
+    "objective": "Determine whether this NDA contains a clause addressing: \"Receiving Party shall destroy or return some Confidential Information upon the termination of Agreement.\" (playbook requires return_of_materials)",
+    "expected_fields": [],
+    "expected_flags": [
+      {
+        "playbook_id": "return_of_materials",
+        "severity": "low"
+      }
+    ],
+    "gold_spans": [],
+    "grader": "flag_match",
+    "notes": "No return-or-destroy clause found; required clause absent"
+  },
+  {
+    "id": "missing_041",
+    "doc_id": "contractnli_6",
+    "source": "contractnli",
+    "contract_type": "nda",
+    "category": "missing",
+    "objective": "Determine whether this NDA contains a clause addressing: \"All Confidential Information shall be expressly identified by the Disclosing Party.\" (playbook requires definition_scope)",
+    "expected_fields": [],
+    "expected_flags": [
+      {
+        "playbook_id": "definition_scope",
+        "severity": "medium"
+      }
+    ],
+    "gold_spans": [],
+    "grader": "flag_match",
+    "notes": "No marking/identification requirement; definition scope absent"
+  },
+  {
+    "id": "missing_042",
+    "doc_id": "contractnli_8",
+    "source": "contractnli",
+    "contract_type": "nda",
+    "category": "missing",
+    "objective": "Determine whether this NDA contains a clause addressing: \"Receiving Party shall destroy or return some Confidential Information upon the termination of Agreement.\" (playbook requires return_of_materials)",
+    "expected_fields": [],
+    "expected_flags": [
+      {
+        "playbook_id": "return_of_materials",
+        "severity": "low"
+      }
+    ],
+    "gold_spans": [],
+    "grader": "flag_match",
+    "notes": "No return-or-destroy clause found; required clause absent"
+  },
+  {
+    "id": "missing_043",
+    "doc_id": "contractnli_11",
+    "source": "contractnli",
+    "contract_type": "nda",
+    "category": "missing",
+    "objective": "Determine whether this NDA contains a clause addressing: \"Some obligations of Agreement may survive termination of Agreement.\" (playbook requires confidentiality_term)",
+    "expected_fields": [],
+    "expected_flags": [
+      {
+        "playbook_id": "confidentiality_term",
+        "severity": "high"
+      }
+    ],
+    "gold_spans": [],
+    "grader": "flag_match",
+    "notes": "No survival clause; confidentiality term absent"
+  },
+  {
+    "id": "missing_044",
+    "doc_id": "contractnli_18",
+    "source": "contractnli",
+    "contract_type": "nda",
+    "category": "missing",
+    "objective": "Determine whether this NDA contains a clause addressing: \"Receiving Party shall destroy or return some Confidential Information upon the termination of Agreement.\" (playbook requires return_of_materials)",
+    "expected_fields": [],
+    "expected_flags": [
+      {
+        "playbook_id": "return_of_materials",
+        "severity": "low"
+      }
+    ],
+    "gold_spans": [],
+    "grader": "flag_match",
+    "notes": "No return-or-destroy clause found; required clause absent"
+  },
+  {
+    "id": "missing_045",
+    "doc_id": "contractnli_21",
+    "source": "contractnli",
+    "contract_type": "nda",
+    "category": "missing",
+    "objective": "Determine whether this NDA contains a clause addressing: \"Receiving Party shall destroy or return some Confidential Information upon the termination of Agreement.\" (playbook requires return_of_materials)",
+    "expected_fields": [],
+    "expected_flags": [
+      {
+        "playbook_id": "return_of_materials",
+        "severity": "low"
+      }
+    ],
+    "gold_spans": [],
+    "grader": "flag_match",
+    "notes": "No return-or-destroy clause found; required clause absent"
+  },
+  {
+    "id": "missing_046",
+    "doc_id": "contractnli_22",
+    "source": "contractnli",
+    "contract_type": "nda",
+    "category": "missing",
+    "objective": "Determine whether this NDA contains a clause addressing: \"Receiving Party shall destroy or return some Confidential Information upon the termination of Agreement.\" (playbook requires return_of_materials)",
+    "expected_fields": [],
+    "expected_flags": [
+      {
+        "playbook_id": "return_of_materials",
+        "severity": "low"
+      }
+    ],
+    "gold_spans": [],
+    "grader": "flag_match",
+    "notes": "No return-or-destroy clause found; required clause absent"
+  },
+  {
+    "id": "missing_047",
+    "doc_id": "contractnli_23",
+    "source": "contractnli",
+    "contract_type": "nda",
+    "category": "missing",
+    "objective": "Determine whether this NDA contains a clause addressing: \"Receiving Party shall destroy or return some Confidential Information upon the termination of Agreement.\" (playbook requires return_of_materials)",
+    "expected_fields": [],
+    "expected_flags": [
+      {
+        "playbook_id": "return_of_materials",
+        "severity": "low"
+      }
+    ],
+    "gold_spans": [],
+    "grader": "flag_match",
+    "notes": "No return-or-destroy clause found; required clause absent"
+  },
+  {
+    "id": "refusal_048",
+    "doc_id": "contractnli_1",
+    "source": "contractnli",
+    "contract_type": "nda",
+    "category": "missing",
+    "objective": "What is the total contract value and payment schedule in this NDA?",
+    "expected_fields": [],
+    "expected_flags": [],
+    "gold_spans": [],
+    "grader": "refusal",
+    "notes": "NDAs do not contain monetary terms; model should refuse and flag insufficient context"
+  },
+  {
+    "id": "refusal_049",
+    "doc_id": "contractnli_2",
+    "source": "contractnli",
+    "contract_type": "nda",
+    "category": "missing",
+    "objective": "How many employees of the Receiving Party are specifically authorized to access the Confidential Information under this agreement?",
+    "expected_fields": [],
+    "expected_flags": [],
+    "gold_spans": [],
+    "grader": "refusal",
+    "notes": "NDA does not specify authorized headcount; numerical personnel question is out of scope"
+  },
+  {
+    "id": "refusal_050",
+    "doc_id": "contractnli_4",
+    "source": "contractnli",
+    "contract_type": "nda",
+    "category": "missing",
+    "objective": "What dollar penalties are specified for breach of this NDA?",
+    "expected_fields": [],
+    "expected_flags": [],
+    "gold_spans": [],
+    "grader": "refusal",
+    "notes": "This NDA has no liquidated-damages clause; dollar-penalty question is unanswerable from the contract text"
+  }
+]

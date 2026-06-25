@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sift.local/schemas/eval-item.json",
+  "title": "EvalItem",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "doc_id", "source", "contract_type", "category", "objective", "expected_fields", "expected_flags", "gold_spans", "grader", "notes"],
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "doc_id": { "type": "string", "minLength": 1 },
+    "source": { "enum": ["cuad", "contractnli"] },
+    "contract_type": { "type": "string" },
+    "category": { "enum": ["clean", "deviated", "missing"] },
+    "objective": { "type": "string", "minLength": 1 },
+    "expected_fields": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["name", "value"],
+        "properties": { "name": { "type": "string" }, "value": { "type": ["string", "null"] } }
+      }
+    },
+    "expected_flags": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["playbook_id", "severity"],
+        "properties": { "playbook_id": { "type": "string" }, "severity": { "enum": ["low", "medium", "high"] } }
+      }
+    },
+    "gold_spans": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["doc_id", "char_start", "char_end", "quote"],
+        "properties": {
+          "doc_id": { "type": "string" },
+          "char_start": { "type": "integer", "minimum": 0 },
+          "char_end": { "type": "integer", "minimum": 0 },
+          "quote": { "type": "string" }
+        }
+      }
+    },
+    "grader": { "enum": ["span_match", "field_match", "flag_match", "refusal"] },
+    "notes": { "type": "string" }
+  }
+}

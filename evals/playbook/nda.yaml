@@ -1,0 +1,59 @@
+# NDA review playbook. Each entry is a position the system checks a clause against.
+# playbook_id is referenced by eval items' expected_flags. Severity = risk if violated.
+- playbook_id: confidentiality_term
+  clause_type: Term / Duration of Confidentiality
+  standard_position: Confidentiality obligations last 3-5 years from disclosure.
+  fallback: Up to 7 years for highly sensitive technical information.
+  red_flags:
+    - Perpetual or indefinite confidentiality term.
+    - Term under 1 year.
+  severity: high
+
+- playbook_id: mutuality
+  clause_type: Mutual vs One-Sided
+  standard_position: Obligations are mutual (both parties bound) when both disclose.
+  fallback: One-sided acceptable only if our party is solely the receiving party.
+  red_flags:
+    - One-sided obligations binding only our client while the counterparty is unbound.
+  severity: medium
+
+- playbook_id: definition_scope
+  clause_type: Definition of Confidential Information
+  standard_position: Confidential Information is marked or reasonably identified as confidential.
+  fallback: Catch-all permitted if paired with standard exclusions.
+  red_flags:
+    - All information deemed confidential with no marking requirement and no exclusions.
+  severity: medium
+
+- playbook_id: exclusions
+  clause_type: Standard Exclusions
+  standard_position: Excludes public, already-known, independently-developed, and third-party info.
+  fallback: At least the public-domain and independently-developed exclusions present.
+  red_flags:
+    - No exclusions from the confidentiality definition.
+  severity: high
+
+- playbook_id: return_of_materials
+  clause_type: Return or Destruction
+  standard_position: On request or termination, materials are returned or destroyed.
+  fallback: Destruction-only with written certification.
+  red_flags:
+    - No return or destruction obligation.
+  severity: low
+
+- playbook_id: governing_law
+  clause_type: Governing Law
+  standard_position: A named, neutral US jurisdiction (e.g. Delaware, New York).
+  fallback: Counterparty's home US state.
+  red_flags:
+    - Foreign governing law inconsistent with the parties.
+    - Governing law unspecified.
+  severity: low
+
+- playbook_id: remedies
+  clause_type: Remedies / Injunctive Relief
+  standard_position: Injunctive relief available; does not waive damages.
+  fallback: Injunctive relief without an automatic fee-shifting clause.
+  red_flags:
+    - Liquidated-damages or penalty clause for disclosure.
+  severity: medium

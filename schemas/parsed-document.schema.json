@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sift.local/schemas/parsed-document.json",
+  "title": "ParsedDocument",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["doc_id", "source", "contract_type", "raw_text", "char_length", "raw_sha256", "nodes"],
+  "properties": {
+    "doc_id": { "type": "string", "minLength": 1 },
+    "source": { "enum": ["cuad", "contractnli"] },
+    "title": { "type": ["string", "null"] },
+    "contract_type": { "type": "string" },
+    "raw_text": { "type": "string" },
+    "char_length": { "type": "integer", "minimum": 0 },
+    "raw_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "nodes": { "type": "array", "items": { "$ref": "#/$defs/node" } }
+  },
+  "$defs": {
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["node_id", "parent_id", "type", "number", "heading", "text", "char_start", "char_end", "depth"],
+      "properties": {
+        "node_id": { "type": "string", "minLength": 1 },
+        "parent_id": { "type": ["string", "null"] },
+        "type": { "enum": ["preamble", "recital", "article", "section", "subsection", "definition", "exhibit", "clause"] },
+        "number": { "type": ["string", "null"] },
+        "heading": { "type": ["string", "null"] },
+        "text": { "type": "string" },
+        "char_start": { "type": "integer", "minimum": 0 },
+        "char_end": { "type": "integer", "minimum": 0 },
+        "depth": { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}
