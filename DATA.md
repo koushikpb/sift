@@ -5,7 +5,7 @@ Public datasets only. No client data, no PII. Record source + license **before**
 | Dataset | Source | License | Use in this project |
 |---|---|---|---|
 | CUAD | The Atticus Project — https://www.atticusprojectai.org/cuad · HF `theatticusproject/cuad-qa` | CC BY 4.0 (credit The Atticus Project) | Gold clause-extraction spans → corpus + eval candidates |
-| ContractNLI | https://stanfordnlp.github.io/contract-nli/ | CC BY 4.0 — **confirm against the dataset's LICENSE/README on download and record the exact string here** | NDA hypotheses (entail/contradict/not-mentioned) + evidence spans → NDA corpus + risk-flag eval candidates |
+| ContractNLI | https://stanfordnlp.github.io/contract-nli/ | CC BY 4.0 — confirmed 2026-06-24 from the dataset's bundled `LICENSE` ("Creative Commons Attribution 4.0 International") | NDA hypotheses (entail/contradict/not-mentioned) + evidence spans → NDA corpus + risk-flag eval candidates |
 
 Planned later (not ingested in Phase 0): LEDGAR (LexGLUE, fine-tuning), LegalBench-RAG
 (retrieval ground truth), LegalBench (reasoning), SEC EDGAR (demo + lease expansion).
