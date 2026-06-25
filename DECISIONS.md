@@ -28,3 +28,11 @@ Architectural decisions, kept current as they are made. Newest first.
   different layers (Python ingestion vs TS eval) and are intentionally not a single shared
   type. The canonical citation format `{ doc_id, char_start, char_end, quote }` is the
   self-describing form; `GoldLabel` spans are the inherited-context form.
+- **`EvalItem.category` and `EvalItem.grader` are orthogonal.** `category`
+  (`clean`/`deviated`/`missing`) describes the *contract state* the item tests; `grader`
+  (`span_match`/`flag_match`/`refusal`) describes *how the item is scored*. A `refusal` item —
+  an out-of-scope question the contract cannot answer — has `category: "missing"` (the queried
+  information is genuinely absent) and `grader: "refusal"` (the correct behavior is to refuse).
+  Refusal items are therefore identified by their grader, never by a dedicated category, which
+  is why the eval-set validator gates on the three category values plus a separate
+  `requireRefusal` check on the grader. No `"refusal"` category is added to the schema.

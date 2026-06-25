@@ -279,12 +279,6 @@
         "char_start": 88993,
         "char_end": 89332,
         "quote": "obligations of the Remarketing Agents may be terminated by them by notice given to the Company prior to 12:00 noon, New York City time on the Remarketing Settlement Date if, prior to that time, any of the applicable conditions precedent to the obligations of the Remarketing Agents described in Section 5 hereof shall have failed to occur."
-      },
-      {
-        "doc_id": "cuad_metlife-inc-remarketing-agreement",
-        "char_start": 14190,
-        "char_end": 14206,
-        "quote": "In addition, the"
       }
     ],
     "grader": "span_match",
@@ -992,12 +986,6 @@
       }
     ],
     "gold_spans": [
-      {
-        "doc_id": "contractnli_24",
-        "char_start": 2798,
-        "char_end": 2802,
-        "quote": "2.2 "
-      },
       {
         "doc_id": "contractnli_24",
         "char_start": 2802,
