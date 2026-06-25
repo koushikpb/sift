@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Literal, Optional
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 NodeType = Literal[
     "preamble", "recital", "article", "section",
@@ -40,7 +40,7 @@ class ParsedDocument(BaseModel):
     contract_type: str
     raw_text: str
     char_length: int
-    raw_sha256: str
+    raw_sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
     nodes: list[Node] = []
 
 

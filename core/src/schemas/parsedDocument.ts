@@ -20,7 +20,7 @@ export const NodeSchema = z.object({
 export const ParsedDocumentSchema = z.object({
   doc_id: z.string().min(1),
   source: z.enum(["cuad", "contractnli"]),
-  title: z.string().nullable(),
+  title: z.string().nullish(),
   contract_type: z.string(),
   raw_text: z.string(),
   char_length: z.number().int().nonnegative(),

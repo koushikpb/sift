@@ -11,9 +11,9 @@ export const GoldLabelSchema = z.object({
   doc_id: z.string().min(1),
   source: z.enum(["cuad", "contractnli"]),
   kind: z.enum(["clause_span", "nli"]),
-  clause_type: z.string().nullable(),
-  hypothesis: z.string().nullable(),
-  nli_label: z.enum(["entailment", "contradiction", "not_mentioned"]).nullable(),
+  clause_type: z.string().nullish(),
+  hypothesis: z.string().nullish(),
+  nli_label: z.enum(["entailment", "contradiction", "not_mentioned"]).nullish(),
   spans: z.array(SpanSchema),
 }).strict();
 
