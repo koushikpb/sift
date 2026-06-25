@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sift.local/schemas/gold-label.json",
+  "title": "GoldLabel",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["label_id", "doc_id", "source", "kind", "spans"],
+  "properties": {
+    "label_id": { "type": "string", "minLength": 1 },
+    "doc_id": { "type": "string", "minLength": 1 },
+    "source": { "enum": ["cuad", "contractnli"] },
+    "kind": { "enum": ["clause_span", "nli"] },
+    "clause_type": { "type": ["string", "null"] },
+    "hypothesis": { "type": ["string", "null"] },
+    "nli_label": { "enum": ["entailment", "contradiction", "not_mentioned", null] },
+    "spans": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["char_start", "char_end", "quote"],
+        "properties": {
+          "char_start": { "type": "integer", "minimum": 0 },
+          "char_end": { "type": "integer", "minimum": 0 },
+          "quote": { "type": "string" }
+        }
+      }
+    }
+  }
+}
