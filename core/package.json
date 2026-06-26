@@ -6,7 +6,8 @@
   "exports": {
     ".": "./src/index.ts",
     "./embed": "./src/embed/model.ts",
-    "./embed/index": "./src/embed/indexClauses.ts"
+    "./embed/index": "./src/embed/indexClauses.ts",
+    "./retrieve": "./src/retrieve/retrieve.ts"
   },
   "scripts": {
     "test": "vitest run",
