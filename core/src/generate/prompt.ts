@@ -22,9 +22,19 @@ export function extractJsonObject(text: string): unknown {
   const start = text.indexOf("{");
   if (start === -1) throw new Error("no JSON object found");
   let depth = 0;
+  let inString = false;
+  let escaped = false;
   for (let i = start; i < text.length; i++) {
-    if (text[i] === "{") depth++;
-    else if (text[i] === "}") {
+    const ch = text[i];
+    if (inString) {
+      if (escaped) escaped = false;
+      else if (ch === "\\") escaped = true;
+      else if (ch === '"') inString = false;
+      continue;
+    }
+    if (ch === '"') { inString = true; continue; }
+    if (ch === "{") depth++;
+    else if (ch === "}") {
       depth--;
       if (depth === 0) return JSON.parse(text.slice(start, i + 1));
     }
@@ -36,7 +46,7 @@ const RawGenSchema = z.object({
   answer: z.string().catch(""),
   supporting: z.array(z.number()).catch([]),
   refused: z.boolean().catch(false),
-  refusal_reason: z.string().nullish(),
+  refusal_reason: z.string().nullish().catch(null),
 });
 
 /** Parse a model response into RawGen; any failure becomes a safe refusal. */

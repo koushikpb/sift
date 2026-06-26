@@ -24,6 +24,10 @@ describe("extractJsonObject", () => {
     expect(extractJsonObject('```json\n{"a":1}\n```')).toEqual({ a: 1 });
     expect(extractJsonObject('Sure!\n{"a":1}\nDone')).toEqual({ a: 1 });
   });
+
+  it("handles a closing brace inside a string value", () => {
+    expect(extractJsonObject('{"answer":"see {clause} applies","refused":false}')).toEqual({ answer: "see {clause} applies", refused: false });
+  });
 });
 
 describe("parseRawGen", () => {
@@ -32,6 +36,13 @@ describe("parseRawGen", () => {
       answer: "x", supporting: [0], refused: false, refusal_reason: null,
     });
     expect(parseRawGen("not json at all").refused).toBe(true);
+  });
+
+  it("keeps a valid answer when refusal_reason is the wrong type", () => {
+    const r = parseRawGen('{"answer":"x","supporting":[0],"refused":false,"refusal_reason":42}');
+    expect(r.refused).toBe(false);
+    expect(r.answer).toBe("x");
+    expect(r.refusal_reason).toBeNull();
   });
 });
 
@@ -51,5 +62,6 @@ describe("toClauseCard", () => {
   it("passes through an explicit refusal", () => {
     const card = toClauseCard("q", { answer: "", supporting: [], refused: true, refusal_reason: "nope" }, cands);
     expect(card).toMatchObject({ refused: true, citations: [], answer: "" });
+    expect(card.refusal_reason).toBe("nope");
   });
 });
