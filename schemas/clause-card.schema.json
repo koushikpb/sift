@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://sift/schemas/clause-card.schema.json",
+  "title": "ClauseCard",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["objective", "answer", "citations", "refused"],
+  "properties": {
+    "objective": { "type": "string", "minLength": 1 },
+    "answer": { "type": "string" },
+    "citations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["doc_id", "char_start", "char_end", "quote"],
+        "properties": {
+          "doc_id": { "type": "string", "minLength": 1 },
+          "char_start": { "type": "integer", "minimum": 0 },
+          "char_end": { "type": "integer", "minimum": 0 },
+          "quote": { "type": "string" }
+        }
+      }
+    },
+    "refused": { "type": "boolean" },
+    "refusal_reason": { "type": ["string", "null"] }
+  }
+}

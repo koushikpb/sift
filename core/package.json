@@ -7,7 +7,8 @@
     ".": "./src/index.ts",
     "./embed": "./src/embed/model.ts",
     "./embed/index": "./src/embed/indexClauses.ts",
-    "./retrieve": "./src/retrieve/retrieve.ts"
+    "./retrieve": "./src/retrieve/retrieve.ts",
+    "./schemas": "./src/schemas/clauseCard.ts"
   },
   "scripts": {
     "test": "vitest run",
