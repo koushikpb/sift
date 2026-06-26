@@ -8,7 +8,8 @@
     "./embed": "./src/embed/model.ts",
     "./embed/index": "./src/embed/indexClauses.ts",
     "./retrieve": "./src/retrieve/retrieve.ts",
-    "./schemas": "./src/schemas/clauseCard.ts"
+    "./schemas": "./src/schemas/clauseCard.ts",
+    "./generate": "./src/generate/index.ts"
   },
   "scripts": {
     "test": "vitest run",
