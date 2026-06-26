@@ -3,15 +3,22 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "scripts": {
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "migrate": "tsx src/db/migrate.ts",
     "load": "tsx src/load/cli.ts",
+    "embed": "tsx src/embed/cli.ts",
     "eval": "tsx src/eval/cli.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.27.0",
+    "@huggingface/transformers": "^3.0.0",
     "dotenv": "^16.4.5",
+    "openai": "^4.67.0",
     "pg": "^8.11.5",
     "yaml": "^2.4.5",
     "zod": "^3.23.8"
@@ -19,6 +26,7 @@
   "devDependencies": {
     "@types/node": "^20.12.0",
     "@types/pg": "^8.11.0",
+    "ajv": "^8.17.1",
     "tsx": "^4.10.0",
     "typescript": "^5.4.5",
     "vitest": "^1.6.0"
