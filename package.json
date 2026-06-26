@@ -5,6 +5,7 @@
   "workspaces": ["core", "app"],
   "scripts": {
     "test:core": "npm --workspace @sift/core run test",
-    "typecheck:core": "npm --workspace @sift/core run typecheck"
+    "typecheck:core": "npm --workspace @sift/core run typecheck",
+    "typecheck:app": "npm --workspace @sift/app run typecheck"
   }
 }
