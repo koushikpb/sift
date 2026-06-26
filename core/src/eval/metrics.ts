@@ -68,13 +68,17 @@ export function recallAtK(
  * IDCG = Σ_{i=1..numRel} 1 / log2(i + 1)   (ideal: all relevant ranked first)
  * NDCG = DCG / IDCG
  *
- * Returns null when numRel === 0 (no relevant candidates in top-k, or gold empty).
+ * Returns null when gold is empty (metric not applicable).
+ * Returns 0 when gold is non-empty but no top-k candidate overlaps any gold span
+ * (total retrieval miss — a real score, not "not applicable").
  */
 export function ndcgAtK(
   retrieved: readonly RankedSpan[],
   gold: readonly RankedSpan[],
   k: number,
 ): number | null {
+  if (gold.length === 0) return null;
+
   const topK = retrieved.slice(0, k);
 
   let dcg = 0;
@@ -87,7 +91,7 @@ export function ndcgAtK(
     }
   }
 
-  if (numRel === 0) return null;
+  if (numRel === 0) return 0;
 
   let idcg = 0;
   for (let i = 0; i < numRel; i++) {

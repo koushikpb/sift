@@ -88,10 +88,10 @@ describe("recallAtK", () => {
 // ─── ndcgAtK ────────────────────────────────────────────────────────────────
 
 describe("ndcgAtK", () => {
-  it("returns null when numRel is 0 (no retrieved span overlaps any gold)", () => {
+  it("returns 0 when gold is non-empty but no retrieved span overlaps any gold (total retrieval miss)", () => {
     const gold = [span("doc", 100, 200)];
     const retrieved = [span("doc", 0, 5), span("doc", 10, 15)];
-    expect(ndcgAtK(retrieved, gold, 2)).toBeNull();
+    expect(ndcgAtK(retrieved, gold, 2)).toBe(0);
   });
 
   it("returns 1 when the single relevant candidate is at rank 1", () => {

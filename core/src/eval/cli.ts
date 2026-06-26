@@ -49,6 +49,13 @@ if (cmd === "derive") {
   const rawItems = JSON.parse(readFileSync(`${root}evals/data/eval-set-v1.json`, "utf-8")) as unknown[];
   const items = rawItems.map((entry) => EvalItemSchema.parse(entry));
   const k = Number(process.env.EVAL_K ?? 8);
+  if (!Number.isFinite(k) || k <= 0 || !Number.isInteger(k)) {
+    process.stderr.write(
+      `error: EVAL_K="${process.env.EVAL_K}" is not a valid positive integer — ` +
+        `got ${k}. Set EVAL_K to a positive integer (e.g. EVAL_K=8) or leave it unset to use the default of 8.\n`,
+    );
+    process.exit(2);
+  }
 
   const rawTextCache = new Map<string, string | null>();
   async function rawText(docId: string): Promise<string | null> {
