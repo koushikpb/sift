@@ -9,7 +9,8 @@
     "./embed/index": "./src/embed/indexClauses.ts",
     "./retrieve": "./src/retrieve/retrieve.ts",
     "./schemas": "./src/schemas/clauseCard.ts",
-    "./generate": "./src/generate/index.ts"
+    "./generate": "./src/generate/index.ts",
+    "./serve": "./src/serve/answerStream.ts"
   },
   "scripts": {
     "test": "vitest run",
