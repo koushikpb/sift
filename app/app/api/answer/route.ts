@@ -1,8 +1,8 @@
-export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
-
 import { streamAnswer, sseEncode } from "@sift/core/serve";
 import type { AnswerDeps } from "@sift/core/serve";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 export async function GET(request: Request): Promise<Response> {
   const url = new URL(request.url);
@@ -42,7 +42,7 @@ export async function GET(request: Request): Promise<Response> {
           }
         }
       } finally {
-        controller.close();
+        try { controller.close(); } catch { /* already closed/cancelled */ }
       }
     },
   });

@@ -44,6 +44,7 @@ export default function Page() {
     });
 
     es.addEventListener("error", (e: MessageEvent) => {
+      if (!e.data) return; // connection-level error — handled by onerror below
       const event = JSON.parse(e.data) as Extract<AnswerEvent, { type: "error" }>;
       setError(event.message);
     });
@@ -56,10 +57,9 @@ export default function Page() {
 
     // Also handle SSE-level errors (connection dropped, etc.)
     es.onerror = () => {
-      if (es.readyState === EventSource.CLOSED) {
-        setRunning(false);
-        esRef.current = null;
-      }
+      es.close();
+      esRef.current = null;
+      setRunning(false);
     };
   }
 
