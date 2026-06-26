@@ -32,4 +32,14 @@ describe("ClauseCard schema", () => {
     const bad: ClauseCard = { ...valid, citations: [{ doc_id: "d1", char_start: 0, char_end: 5, quote: "ZZZZZ" }] };
     expect(() => assertCardCitations(bad, raw)).toThrow(/citation/i);
   });
+
+  it("assertCardCitations throws for an unknown doc_id", () => {
+    const empty = new Map<string, string>(); // "d1" absent
+    expect(() => assertCardCitations(valid, empty)).toThrow(/citation/i);
+  });
+
+  it("rejects an unknown key inside a citation Span (Zod strict)", () => {
+    const badSpan = { ...valid, citations: [{ doc_id: "d1", char_start: 0, char_end: 5, quote: "ABCDE", extra: 1 }] };
+    expect(() => ClauseCardSchema.parse(badSpan)).toThrow();
+  });
 });
