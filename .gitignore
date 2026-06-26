@@ -27,3 +27,6 @@ dist/
 # eval intermediates
 evals/data/candidates.jsonl
 
+# subagent-driven-development scratch (briefs, reports, ledger)
+/.superpowers/
+
