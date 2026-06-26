@@ -5,7 +5,8 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./embed": "./src/embed/model.ts"
+    "./embed": "./src/embed/model.ts",
+    "./embed/index": "./src/embed/indexClauses.ts"
   },
   "scripts": {
     "test": "vitest run",
