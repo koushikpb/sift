@@ -3,8 +3,6 @@ export const dynamic = "force-dynamic";
 
 import { streamAnswer, sseEncode } from "@sift/core/serve";
 import type { AnswerDeps } from "@sift/core/serve";
-import { retrieve } from "@sift/core/retrieve";
-import { makeGenerator } from "@sift/core/generate";
 
 export async function GET(request: Request): Promise<Response> {
   const url = new URL(request.url);
@@ -19,7 +17,13 @@ export async function GET(request: Request): Promise<Response> {
     );
   }
 
-  const k = kParam != null ? parseInt(kParam, 10) : undefined;
+  const [{ retrieve }, { makeGenerator }] = await Promise.all([
+    import("@sift/core/retrieve"),
+    import("@sift/core/generate"),
+  ]);
+
+  const kParsed = kParam != null ? parseInt(kParam, 10) : undefined;
+  const k = kParsed !== undefined && (isNaN(kParsed) || kParsed < 1) ? undefined : kParsed;
 
   const gen = makeGenerator();
   const deps: AnswerDeps = {

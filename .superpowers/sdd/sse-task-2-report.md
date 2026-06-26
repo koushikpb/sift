@@ -115,3 +115,84 @@ The package is marked as `serverExternalPackages` (not bundled), but it's still 
 2. **npm audit vulnerabilities**: 6 vulnerabilities (4 moderate, 1 high, 1 critical) in the dependency tree. These are from the newly installed packages. Not blocking, but should be reviewed before production.
 
 3. **`next-env.d.ts` modified by `next build`**: The build run added a `/// <reference path="./.next/types/routes.d.ts" />` line. This is standard Next.js behavior; the file is committed with this line.
+
+---
+
+## Fix: Lazy-Import Heavy Core Deps in SSE Route (build-safe) + guard k
+
+### Commit: `fix(app): lazy-import heavy core deps in SSE route (build-safe) + guard k`
+
+### What Changed
+
+**File: `app/app/api/answer/route.ts`**
+
+1. Removed top-level static imports:
+   ```ts
+   import { retrieve } from "@sift/core/retrieve";
+   import { makeGenerator } from "@sift/core/generate";
+   ```
+
+2. Added dynamic imports inside the GET handler, after the 400 guard:
+   ```ts
+   const [{ retrieve }, { makeGenerator }] = await Promise.all([
+     import("@sift/core/retrieve"),
+     import("@sift/core/generate"),
+   ]);
+   ```
+
+3. Added NaN/non-positive guard for the `k` query param:
+   ```ts
+   const kParsed = kParam != null ? parseInt(kParam, 10) : undefined;
+   const k = kParsed !== undefined && (isNaN(kParsed) || kParsed < 1) ? undefined : kParsed;
+   ```
+   Invalid values (NaN, 0, negative) fall through as `undefined`, letting `streamAnswer` use its default `k=8`.
+
+### Typecheck Output
+
+```
+$ npm --workspace @sift/app run typecheck
+
+> @sift/app@0.0.0 typecheck
+> tsc --noEmit
+```
+
+Exit code: 0. **Zero errors. Merge gate passed.**
+
+### Build Output
+
+```
+$ cd /Users/koushik/Documents/GitHub/sift/app && npx next build
+
+   ▲ Next.js 15.5.19
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 1044ms
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/4) ...
+   Generating static pages (1/4) 
+   Generating static pages (2/4) 
+   Generating static pages (3/4) 
+ ✓ Generating static pages (4/4)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                 Size  First Load JS
+┌ ○ /                                     1.4 kB         103 kB
+├ ○ /_not-found                            995 B         103 kB
+└ ƒ /api/answer                            127 B         102 kB
++ First Load JS shared by all             102 kB
+  ├ chunks/131-a68a87dd22cef82b.js       45.4 kB
+  ├ chunks/c7879cf7-b5ab1053c1d9a2e7.js  54.2 kB
+  └ other shared chunks (total)          1.88 kB
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+```
+
+Exit code: 0. **Build completes successfully.** The `@huggingface/transformers` build-time failure is fully resolved — the "Collecting page data" phase no longer imports the heavy deps at module evaluation time.
+
+### Remaining Concerns
+
+None new. The prior audit vulnerability concern remains but is unrelated to this fix.
