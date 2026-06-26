@@ -10,7 +10,7 @@ let _extractor: Promise<FeatureExtractionPipeline> | null = null;
 function extractor(): Promise<FeatureExtractionPipeline> {
   // Cast needed: `pipeline()` v3 returns a union too complex for tsc (TS2590).
   // The runtime value is always a FeatureExtractionPipeline; the contract is unchanged.
-  return (_extractor ??= pipeline("feature-extraction", "Xenova/bge-large-en-v1.5") as unknown as Promise<FeatureExtractionPipeline>);
+  return (_extractor ??= pipeline("feature-extraction", "Xenova/bge-large-en-v1.5", { dtype: "fp32" }) as unknown as Promise<FeatureExtractionPipeline>);
 }
 
 export async function embedTexts(
