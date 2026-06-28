@@ -7,7 +7,7 @@ export function makeGenerator(): Generator {
   const provider = process.env.LLM_PROVIDER ?? "openai";
   if (provider === "openai") return makeOpenAICompatGenerator();
   if (provider === "anthropic") return makeAnthropicGenerator();
-  throw new Error(`unknown LLM_PROVIDER: ${provider}`);
+  throw new Error(`unknown LLM_PROVIDER: "${provider}" (expected "openai" or "anthropic")`);
 }
 
 export type { Generator, GenInput, RawGen } from "./types.js";

@@ -73,6 +73,8 @@ if (cmd === "derive") {
     retrieve,
     generate: gen.generate.bind(gen),
     rawText,
+    onProgress: (done: number, total: number, item: { id: string }) =>
+      process.stderr.write(`item ${done}/${total} ${item.id}\n`),
   };
 
   const report = await runEval(items, deps, k);

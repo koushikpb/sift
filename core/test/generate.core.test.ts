@@ -1,6 +1,7 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, afterEach } from "vitest";
 import { buildPrompt, extractJsonObject, parseRawGen } from "../src/generate/prompt.js";
 import { toClauseCard } from "../src/generate/toClauseCard.js";
+import { makeGenerator } from "../src/generate/index.js";
 import type { Candidate } from "../src/retrieve/retrieve.js";
 
 const cands: Candidate[] = [
@@ -63,5 +64,30 @@ describe("toClauseCard", () => {
     const card = toClauseCard("q", { answer: "", supporting: [], refused: true, refusal_reason: "nope" }, cands);
     expect(card).toMatchObject({ refused: true, citations: [], answer: "" });
     expect(card.refusal_reason).toBe("nope");
+  });
+});
+
+// ─── makeGenerator: unknown provider error message ────────────────────────────
+
+describe("makeGenerator — unknown LLM_PROVIDER", () => {
+  const originalProvider = process.env.LLM_PROVIDER;
+
+  afterEach(() => {
+    // Restore env var after each test to avoid polluting other tests
+    if (originalProvider === undefined) {
+      delete process.env.LLM_PROVIDER;
+    } else {
+      process.env.LLM_PROVIDER = originalProvider;
+    }
+  });
+
+  it("throws with message containing 'expected \"openai\" or \"anthropic\"'", () => {
+    process.env.LLM_PROVIDER = "badprovider";
+    expect(() => makeGenerator()).toThrowError(/expected "openai" or "anthropic"/);
+  });
+
+  it("includes the bad provider name in the error message", () => {
+    process.env.LLM_PROVIDER = "badprovider";
+    expect(() => makeGenerator()).toThrowError(/unknown LLM_PROVIDER: "badprovider"/);
   });
 });
