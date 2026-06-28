@@ -22,8 +22,10 @@ dist/
 # OS
 .DS_Store
 
-/.claude
-
 # eval intermediates
 evals/data/candidates.jsonl
+
+# Agent-driven-development 
+/.claude
+/.superpowers/
 
