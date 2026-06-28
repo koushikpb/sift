@@ -176,3 +176,34 @@ Law" hit clause titles hard; body text weighted `B`.
 - **FTS English stemming on legal text** — defined terms and section numbers may tokenize
   oddly; `ts_rank_cd` + heading weighting should cover the common cases. Revisit only if the
   eval shows lexical recall is weak.
+
+## Results (P2a) — 2026-06-28
+
+Hybrid (dense + Postgres FTS → RRF → `Xenova/ms-marco-MiniLM-L-6-v2` cross-encoder rerank)
+vs the P1 naive baseline, same `eval-set-v1` (50 items), `meta/llama-3.3-70b-instruct`
+generation, k=8. Reports: `evals/reports/baseline.json` vs `evals/reports/p2a.json`.
+
+| metric | baseline | P2a | delta |
+|---|---|---|---|
+| recall@8 | 0.7477 | 0.7838 | **+0.0360** |
+| NDCG@8 | 0.5592 | 0.6320 | **+0.0728** |
+| groundedness | 1.0000 | 1.0000 | +0.0000 |
+| refusal_rate | 0.3200 | 0.3200 | +0.0000 |
+| false_negative_rate | 0.3243 | 0.2973 | **−0.0270** |
+
+(0 errored in both runs.)
+
+**Gate: PASS.** Groundedness held at 1.0 (no new hallucination), retrieval improved
+(recall +3.6 pts, NDCG +7.3 pts), and the false-negative rate on the 37 answerable items
+fell 2.7 pts (≈1 fewer miss).
+
+**Reading it.** The reranker's reordering shows up most in **NDCG** (+7.3) — gold spans that
+were already retrieved are now ranked higher. The **recall@8** gain is smaller (+3.6) because
+for the many small docs (median 18 clauses, many ≤8) recall@8 is already near its ceiling
+with dense alone; the headroom is concentrated in larger docs where lexical + rerank pulled a
+gold span from rank 9+ into the top-8. Refusal rate is unchanged (0.32) but the answerable
+miss rate fell — the gains landed where they should.
+
+**For P2b.** Recall is still the lever — a legal-domain embedder, query reformulation, and the
+agentic retrieve→evaluate loop are where the next gains are. Reranking has largely done its
+job on ranking quality.
