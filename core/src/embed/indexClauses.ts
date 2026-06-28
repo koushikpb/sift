@@ -6,12 +6,18 @@ export async function indexAllClauses(
   opts: { batchSize?: number; docId?: string } = {},
 ): Promise<{ embedded: number }> {
   const batchSize = opts.batchSize ?? 32;
-  const where = opts.docId ? "WHERE doc_id = $1" : "";
+  const where = opts.docId
+    ? "WHERE e.node_id IS NULL AND c.doc_id = $1"
+    : "WHERE e.node_id IS NULL";
   const params = opts.docId ? [opts.docId] : [];
   const rows = (
     await withClient((c) =>
       c.query<{ node_id: string; text: string }>(
-        `SELECT node_id, text FROM clauses ${where} ORDER BY node_id`,
+        `SELECT c.node_id, c.text
+         FROM clauses c
+         LEFT JOIN embeddings e ON e.node_id = c.node_id
+         ${where}
+         ORDER BY c.node_id`,
         params,
       ),
     )
@@ -32,6 +38,7 @@ export async function indexAllClauses(
         embedded += 1;
       }
     });
+    process.stderr.write(`embedded ${Math.min(i + batchSize, rows.length)}/${rows.length}\n`);
   }
   return { embedded };
 }
