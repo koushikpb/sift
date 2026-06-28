@@ -79,8 +79,16 @@ if (cmd === "derive") {
 
   const report = await runEval(items, deps, k);
 
+  // Provenance: record which provider/model produced this report (env-resolved,
+  // matching how makeGenerator() picks them) so a committed baseline is reproducible.
+  const provider = process.env.LLM_PROVIDER ?? "openai";
+  const model = process.env.LLM_MODEL ?? null;
+
   mkdirSync(`${root}evals/reports`, { recursive: true });
-  writeFileSync(`${root}evals/reports/baseline.json`, JSON.stringify(report, null, 2) + "\n");
+  writeFileSync(
+    `${root}evals/reports/baseline.json`,
+    JSON.stringify({ provider, model, ...report }, null, 2) + "\n",
+  );
 
   console.log(JSON.stringify({
     k: report.k,
