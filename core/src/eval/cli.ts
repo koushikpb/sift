@@ -8,6 +8,7 @@ import { deriveCandidates } from "./derive.js";
 import { validateEvalSet } from "./validate.js";
 import { EvalItemSchema } from "./evalItem.js";
 import { runEval } from "./runEval.js";
+import { compareReports, formatDelta } from "./compare.js";
 import { retrieve } from "../retrieve/retrieve.js";
 import { makeGenerator } from "../generate/index.js";
 import { withClient } from "../db/client.js";
@@ -96,7 +97,17 @@ if (cmd === "derive") {
     aggregates: report.aggregates,
   }, null, 2));
   process.exit(0);
+} else if (cmd === "compare") {
+  const [aArg, bArg] = process.argv.slice(3);
+  if (!aArg || !bArg) {
+    console.error("usage: tsx src/eval/cli.ts compare <baselineFile> <candidateFile>  (files under evals/reports/)");
+    process.exit(2);
+  }
+  const a = JSON.parse(readFileSync(`${root}evals/reports/${aArg}`, "utf-8"));
+  const b = JSON.parse(readFileSync(`${root}evals/reports/${bArg}`, "utf-8"));
+  console.log(formatDelta(compareReports(a, b)));
+  process.exit(0);
 } else {
-  console.error("usage: tsx src/eval/cli.ts <derive|validate|run>");
+  console.error("usage: tsx src/eval/cli.ts <derive|validate|run|compare>");
   process.exit(2);
 }
