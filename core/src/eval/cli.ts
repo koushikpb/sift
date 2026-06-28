@@ -8,7 +8,8 @@ import { deriveCandidates } from "./derive.js";
 import { validateEvalSet } from "./validate.js";
 import { EvalItemSchema } from "./evalItem.js";
 import { runEval } from "./runEval.js";
-import { retrieve } from "../retrieve/retrieve.js";
+import { compareReports, formatDelta } from "./compare.js";
+import { makeRetriever } from "../retrieve/retrieve.js";
 import { makeGenerator } from "../generate/index.js";
 import { withClient } from "../db/client.js";
 
@@ -68,6 +69,9 @@ if (cmd === "derive") {
     return rawTextCache.get(docId)!;
   }
 
+  const mode = process.env.RETRIEVE_MODE ?? "naive";
+  const retrieve = makeRetriever(mode);
+
   const gen = makeGenerator();
   const deps = {
     retrieve,
@@ -79,24 +83,31 @@ if (cmd === "derive") {
 
   const report = await runEval(items, deps, k);
 
-  // Provenance: record which provider/model produced this report (env-resolved,
-  // matching how makeGenerator() picks them) so a committed baseline is reproducible.
+  // Provenance: provider/model match makeGenerator(); retrieve_mode + rerank_model record P2a config.
   const provider = process.env.LLM_PROVIDER ?? "openai";
   const model = process.env.LLM_MODEL ?? null;
+  const rerank_model = mode === "hybrid" ? (process.env.RERANK_MODEL ?? "Xenova/ms-marco-MiniLM-L-6-v2") : null;
 
+  const outName = mode === "hybrid" ? "p2a.json" : "baseline.json";
   mkdirSync(`${root}evals/reports`, { recursive: true });
   writeFileSync(
-    `${root}evals/reports/baseline.json`,
-    JSON.stringify({ provider, model, ...report }, null, 2) + "\n",
+    `${root}evals/reports/${outName}`,
+    JSON.stringify({ provider, model, retrieve_mode: mode, rerank_model, ...report }, null, 2) + "\n",
   );
 
-  console.log(JSON.stringify({
-    k: report.k,
-    total: report.total,
-    aggregates: report.aggregates,
-  }, null, 2));
+  console.log(JSON.stringify({ retrieve_mode: mode, k: report.k, total: report.total, aggregates: report.aggregates }, null, 2));
+  process.exit(0);
+} else if (cmd === "compare") {
+  const [aArg, bArg] = process.argv.slice(3);
+  if (!aArg || !bArg) {
+    console.error("usage: tsx src/eval/cli.ts compare <baselineFile> <candidateFile>  (files under evals/reports/)");
+    process.exit(2);
+  }
+  const a = JSON.parse(readFileSync(`${root}evals/reports/${aArg}`, "utf-8"));
+  const b = JSON.parse(readFileSync(`${root}evals/reports/${bArg}`, "utf-8"));
+  console.log(formatDelta(compareReports(a, b)));
   process.exit(0);
 } else {
-  console.error("usage: tsx src/eval/cli.ts <derive|validate|run>");
+  console.error("usage: tsx src/eval/cli.ts <derive|validate|run|compare>");
   process.exit(2);
 }

@@ -17,7 +17,7 @@ export async function GET(request: Request): Promise<Response> {
     );
   }
 
-  const [{ retrieve }, { makeGenerator }] = await Promise.all([
+  const [{ makeRetriever }, { makeGenerator }] = await Promise.all([
     import("@sift/core/retrieve"),
     import("@sift/core/generate"),
   ]);
@@ -27,7 +27,7 @@ export async function GET(request: Request): Promise<Response> {
 
   const gen = makeGenerator();
   const deps: AnswerDeps = {
-    retrieve,
+    retrieve: makeRetriever(process.env.RETRIEVE_MODE),
     generate: gen.generate.bind(gen),
   };
 
