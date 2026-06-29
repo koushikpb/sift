@@ -14,6 +14,8 @@ export interface AgenticDeps {
   judge: (objective: string, candidates: Candidate[]) => Promise<JudgeVerdict>;
 }
 
+// MAX_ROUNDS gates a single retry: the loop is strictly round-1 + one optional reformulation
+// round. 2 is the supported value this slice; a true N-round loop would be a follow-up.
 export const AGENT_DEFAULTS = { MAX_ROUNDS: 2, N: 50, M: 100, K_RRF: 60 };
 export type AgenticConfig = typeof AGENT_DEFAULTS;
 

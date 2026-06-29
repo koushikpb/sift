@@ -32,14 +32,16 @@ describe("agenticRetrieve", () => {
     const lexical = vi.fn()
       .mockResolvedValueOnce([cand("b")])
       .mockResolvedValueOnce([cand("d")]);
+    const rerank = rr();
     const deps: AgenticDeps = {
-      dense, lexical, rerank: rr(), rrfFuse,
+      dense, lexical, rerank, rrfFuse,
       judge: vi.fn().mockResolvedValue({ sufficient: false, reformulations: ["r1"] }),
     };
     const out = await agenticRetrieve("q", "d", 8, deps, cfg);
     expect(dense).toHaveBeenCalledTimes(2);
     expect(dense.mock.calls[1][0]).toBe("r1"); // reformulated query used
     expect(out.map((c) => c.node_id).sort()).toEqual(["a", "b", "c", "d"]); // fused union
+    expect(rerank).toHaveBeenCalledTimes(2);
   });
 
   it("stops early (returns round-1) when a reformulation round adds no new candidates", async () => {
