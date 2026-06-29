@@ -159,3 +159,44 @@ paid legal embedder is worth a future slice.
 - **HNSW + model filter.** Doc-scoped retrieval already scans a tiny per-doc candidate set, so
   the added `e.model` filter is correct and cheap even though the single HNSW index spans both
   models; no per-model partial index is needed at this corpus size.
+
+## Results (P2b) — 2026-06-29
+
+`bge-large-en-v1.5` vs `mxbai-embed-large-v1`, both NAIVE (dense-only, to isolate the
+embedder), same `eval-set-v1` (50 items), `meta/llama-3.3-70b-instruct`, k=8. Reports:
+`evals/reports/baseline.json` (bge) vs `evals/reports/p2b-mxbai.json` (mxbai).
+
+| metric | bge-large | mxbai | delta |
+|---|---|---|---|
+| recall@8 | 0.7477 | 0.7452 | −0.0026 |
+| NDCG@8 | 0.5592 | 0.5717 | +0.0125 |
+| groundedness | 1.0000 | 1.0000 | +0.0000 |
+| refusal_rate | 0.3200 | 0.3800 | +0.0600 |
+| false_negative_rate | 0.3243 | 0.3514 | +0.0270 |
+
+(0 errored in both runs.)
+
+**Decision: KEEP `bge-large-en-v1.5` as the default embedder.** mxbai does not beat it —
+recall@8 is flat-to-slightly-worse, NDCG is marginally up, but the two metrics that capture
+"did we surface the required clause" (refusal_rate, false_negative_rate) both regressed
+(+6.0 pts and +2.7 pts). Groundedness held at 1.0. The decision rule (adopt only on a
+recall/NDCG lift) is not met.
+
+**Reading it — a useful measured null.** Two top-tier *general* English embedders are
+comparable on these legal clauses, and bge edges it. So a stronger **general** embedder is
+**not** the recall lever. The pooling/prompt were pinned to mxbai's model card (CLS + the
+retrieval prompt) and the T2 model test confirmed valid normalized 1024-d vectors distinct
+from bge, so this is a genuine quality result, not a misconfiguration: a modest under-perform
+(not a collapse) is what "valid but not better" looks like.
+
+**For P2c and beyond.** The remaining recall levers are (a) a **legal-domain** embedder
+(`voyage-law-2`, paid) — the domain-gap hypothesis this null *doesn't* rule out, and (b) the
+**agentic retrieve→evaluate loop** (query reformulation + retry) to rescue the one-shot
+misses. Since bge already matches a top general model, the free lever is (b); the paid legal
+embedder (a) is now an evidence-driven "maybe later," not a default next step.
+
+**Durable deliverable.** Regardless of the null, P2b leaves embedding **model-aware**
+(registry + `(node_id, model)` key + model-filtered retrieval), so re-testing any future
+embedder — including `voyage-law-2` — is a config change plus a re-embed, not a code change.
+(mxbai's vectors remain in `embeddings` under `model='mxbai-embed-large-v1'`; harmless —
+default retrieval filters to bge — and kept in case of a future re-test.)
