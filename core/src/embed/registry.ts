@@ -25,7 +25,7 @@ export const EMBED_REGISTRY: Record<string, EmbedConfig> = {
 };
 
 export function resolveEmbedConfig(name: string): EmbedConfig {
-  const cfg = EMBED_REGISTRY[name];
+  const cfg: EmbedConfig | undefined = EMBED_REGISTRY[name];
   if (!cfg) {
     throw new Error(
       `unknown EMBED_MODEL: "${name}" (known: ${Object.keys(EMBED_REGISTRY).join(", ")})`,
