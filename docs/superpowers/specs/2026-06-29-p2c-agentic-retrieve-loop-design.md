@@ -203,7 +203,58 @@ minutes. Acceptable, and `LLM_RPM` paces it under the NIM free cap.
   stay byte-for-byte for the generator-only path; `throttle.test.ts` plus the existing generator
   tests guard this.
 
-## Results (P2c) — TBD
+## Results (P2c) — 2026-06-29
 
-(Filled in after the gated eval run: the p2a→p2c delta table, the rescued-items tally, the
-`missing`-category refusal check, and the KEEP/REVERT decision per the gate above.)
+Agentic (`RETRIEVE_MODE=agentic`, 2 rounds, `bge-large` dense + Postgres FTS lexical → RRF →
+`ms-marco-MiniLM-L-6-v2` rerank, `judgeSufficiency` on `meta/llama-3.3-70b-instruct`) vs the P2a
+hybrid best, same `eval-set-v1` (50 items), k=8. Reports: `evals/reports/p2a.json` vs
+`evals/reports/p2c.json`.
+
+| metric | P2a (hybrid) | P2c (agentic) | delta |
+|---|---|---|---|
+| recall@8 | 0.7838 | 0.7838 | +0.0000 |
+| NDCG@8 | 0.6320 | 0.6373 | **+0.0052** |
+| groundedness | 1.0000 | 1.0000 | +0.0000 |
+| refusal_rate | 0.3200 | 0.3000 | **−0.0200** |
+| false_negative_rate | 0.2973 | 0.2703 | **−0.0270** |
+
+(0 errored in both runs.)
+
+**Gate: PASS.** false-negative rate improved (−2.7 pts, the spec's top-line answerable-miss
+metric), groundedness held at 1.0, and the make-or-break guardrail held: the **`missing`
+category refused 7/13 in both runs — identical**, so the loop did not manufacture context for
+out-of-scope questions. The entire refusal drop came from `clean` (7/22 → 6/22); `deviated`
+(2/15) and `missing` (7/13) were unchanged. The decision rule (improve recall@8 *and/or*
+false_negative_rate, groundedness held, refusal preserved) is met.
+
+**Decision: KEEP agentic mode as `RETRIEVE_MODE=agentic`** (the eval/app flip to it; default
+stays `naive` for reproducibility, `hybrid` remains the non-agentic comparison point).
+
+**Reading it — the loop helps at the margin, by ranking not recall.** Loop observability over the
+50 items: the judge passed 28 at round 1; **22 triggered a retry**, but **18 of those 22
+converged** (the reformulations retrieved only node_ids already in the round-1 pool → the
+convergence guard returned round-1), and **only 4** got a genuinely new candidate pool. There
+were **0 recall rescues and 0 recall regressions** (recall@8 flat), so no gold span was newly
+retrieved *or* lost. The single rescued item — **`clean_015`** — had its gold span retrieved in
+*both* runs (recall@8 = 1 each), but P2a's generator **refused despite holding it**, while P2c
+**answered, grounded** (NDCG 1, 1 citation): the reformulation round + re-rank lifted the gold
+span's rank, and the generator then committed. So on this corpus the agentic lever is **ranking
++ generation confidence** (rescuing a false refusal), not raw retrieval recall.
+
+**Why recall didn't move — and what it means for P3.** Per-doc pools are small (median 18
+clauses) so recall@8 was already near its ceiling under hybrid: the gold spans the `bge`
+embedder *can* surface were already in the top-8. The convergence statistic is the headline
+finding: **18 of 22 reformulation rounds found nothing new**, strong evidence that prompt-based
+query reformulation has largely **exhausted what the current embedder can retrieve**. The
+remaining ~27% false-negative rate is dominated by items whose gold span isn't in the
+doc-scoped retrievable pool at all. That steers P3: a LoRA **query-rewriter** would likely hit
+the same embedder ceiling (reformulations already converge), so the evidence leans toward the
+**retrieval substrate** — a legal-domain embedder (`voyage-law-2`, the P2b-deferred "maybe
+later") or better chunking — over the rewriter as the higher-leverage next lever. The agentic
+loop is kept because it is a safe, free, marginal win (one false refusal rescued, no
+regressions, refusal contract intact), and it completes SPEC Layer 1 step 6.
+
+**Durable deliverable.** P2c leaves the retrieval boundary with three measured modes
+(`naive` / `hybrid` / `agentic`) behind one `makeRetriever` factory, an injectable sufficiency
+judge, and a shared LLM rpm throttle — so the agentic loop, the judge model, and the round cap
+are all config/injection changes, not code changes, for any future re-test.
