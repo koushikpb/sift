@@ -83,19 +83,21 @@ if (cmd === "derive") {
 
   const report = await runEval(items, deps, k);
 
-  // Provenance: provider/model match makeGenerator(); retrieve_mode + rerank_model record P2a config.
+  // Provenance: provider/model match makeGenerator(); retrieve_mode/rerank_model/embed_model record config.
   const provider = process.env.LLM_PROVIDER ?? "openai";
   const model = process.env.LLM_MODEL ?? null;
   const rerank_model = mode === "hybrid" ? (process.env.RERANK_MODEL ?? "Xenova/ms-marco-MiniLM-L-6-v2") : null;
+  const embed_model = process.env.EMBED_MODEL ?? "bge-large-en-v1.5";
 
-  const outName = mode === "hybrid" ? "p2a.json" : "baseline.json";
+  // EVAL_OUT overrides the report filename so a benchmark run doesn't clobber baseline.json/p2a.json.
+  const outName = process.env.EVAL_OUT ?? (mode === "hybrid" ? "p2a.json" : "baseline.json");
   mkdirSync(`${root}evals/reports`, { recursive: true });
   writeFileSync(
     `${root}evals/reports/${outName}`,
-    JSON.stringify({ provider, model, retrieve_mode: mode, rerank_model, ...report }, null, 2) + "\n",
+    JSON.stringify({ provider, model, retrieve_mode: mode, rerank_model, embed_model, ...report }, null, 2) + "\n",
   );
 
-  console.log(JSON.stringify({ retrieve_mode: mode, k: report.k, total: report.total, aggregates: report.aggregates }, null, 2));
+  console.log(JSON.stringify({ retrieve_mode: mode, embed_model, k: report.k, total: report.total, aggregates: report.aggregates }, null, 2));
   process.exit(0);
 } else if (cmd === "compare") {
   const [aArg, bArg] = process.argv.slice(3);
