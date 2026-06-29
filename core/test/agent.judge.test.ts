@@ -51,4 +51,28 @@ describe("judgeSufficiency", () => {
     expect(arg.messages[1].content).toContain("What law governs?");
     expect(arg.messages[1].content).toContain("[0]");
   });
+
+  it("treats a non-boolean `sufficient` with reformulations as insufficient", async () => {
+    const v = await judgeSufficiency("q", cands, {
+      client: fakeClient('{"sufficient":"yes","reformulations":["jurisdiction"]}'),
+      model: "m", minIntervalMs: 0,
+    });
+    expect(v).toEqual({ sufficient: false, reformulations: ["jurisdiction"] });
+  });
+
+  it("defaults to sufficient when `sufficient` is missing and there are no reformulations", async () => {
+    const v = await judgeSufficiency("q", cands, {
+      client: fakeClient('{"reformulations":[]}'),
+      model: "m", minIntervalMs: 0,
+    });
+    expect(v).toEqual({ sufficient: true, reformulations: [] });
+  });
+
+  it("drops whitespace-only reformulations", async () => {
+    const v = await judgeSufficiency("q", cands, {
+      client: fakeClient('{"sufficient":false,"reformulations":["   ","governing law"]}'),
+      model: "m", minIntervalMs: 0,
+    });
+    expect(v.reformulations).toEqual(["governing law"]);
+  });
 });

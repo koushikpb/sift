@@ -35,7 +35,7 @@ function buildUser(objective: string, candidates: Candidate[]): string {
 }
 
 const VerdictSchema = z.object({
-  sufficient: z.boolean().catch(false),
+  sufficient: z.unknown(),
   reformulations: z.array(z.string()).catch([]),
 });
 
@@ -59,10 +59,9 @@ export async function judgeSufficiency(
     }) as unknown as ChatClient);
   const minIntervalMs = deps.minIntervalMs ?? resolveMinIntervalMs();
 
-  await reserveSlot(minIntervalMs);
-
   let content: string;
   try {
+    await reserveSlot(minIntervalMs);
     const resp = await client.chat.completions.create({
       model,
       temperature: 0,
@@ -82,7 +81,10 @@ export async function judgeSufficiency(
       .map((s) => s.trim())
       .filter((s) => s.length > 0)
       .slice(0, 3);
-    return { sufficient: obj.sufficient, reformulations };
+    // Safe default when the model omits/garbles `sufficient`: treat as sufficient (stop the loop)
+    // unless it supplied reformulations, which is itself an insufficiency signal.
+    const sufficient = typeof obj.sufficient === "boolean" ? obj.sufficient : reformulations.length === 0;
+    return { sufficient, reformulations };
   } catch {
     return { sufficient: true, reformulations: [] };
   }
