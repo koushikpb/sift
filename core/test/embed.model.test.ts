@@ -16,4 +16,13 @@ describe("embedTexts", () => {
     const [p] = await embedTexts(["governing law"], { kind: "passage" });
     expect(q).not.toEqual(p);
   }, 120_000);
+
+  it("loads a second registry model (mxbai) → normalized 1024-d, distinct from bge", async () => {
+    const [m] = await embedTexts(["governing law"], { kind: "passage", model: "mxbai-embed-large-v1" });
+    expect(m).toHaveLength(EMBED_DIM);
+    const norm = Math.sqrt(m.reduce((s, x) => s + x * x, 0));
+    expect(norm).toBeCloseTo(1, 2);
+    const [b] = await embedTexts(["governing law"], { kind: "passage", model: "bge-large-en-v1.5" });
+    expect(m).not.toEqual(b);
+  }, 300_000);
 });
