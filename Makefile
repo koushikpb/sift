@@ -39,6 +39,8 @@ parse:
 .PHONY: clf-extract clf-baseline clf-train clf-eval
 clf-extract:
 	cd pipeline && .venv/bin/python -m pipeline.classify.extract
+clf-baseline:
+	cd pipeline && .venv/bin/python -m pipeline.classify.baseline
 
 .PHONY: eval-derive eval-validate
 eval-derive:
