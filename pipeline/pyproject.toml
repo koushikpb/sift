@@ -10,6 +10,14 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0", "ruff>=0.4"]
+ml = [
+  "torch>=2.2",
+  "transformers>=4.44",
+  "peft>=0.12",
+  "datasets>=2.18",
+  "sentencepiece>=0.2",
+  "protobuf>=4.25",
+]
 
 [build-system]
 requires = ["setuptools>=68"]

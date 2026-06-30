@@ -41,6 +41,10 @@ clf-extract:
 	cd pipeline && .venv/bin/python -m pipeline.classify.extract
 clf-baseline:
 	cd pipeline && .venv/bin/python -m pipeline.classify.baseline
+clf-train:
+	cd pipeline && .venv/bin/python -m pipeline.classify.train
+clf-eval:
+	cd pipeline && .venv/bin/python -m pipeline.classify.evaluate
 
 .PHONY: eval-derive eval-validate
 eval-derive:
