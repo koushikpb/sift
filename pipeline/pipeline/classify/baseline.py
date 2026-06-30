@@ -13,6 +13,18 @@ from pipeline.classify.models import ClfReport, load_examples, load_label_map
 
 UNMATCHED = "__unmatched__"
 _REPO_ROOT = Path(__file__).parents[3]
+
+
+def error_guard(errors: int, n: int, threshold: float = 0.03) -> None:
+    """Raise if transport errors exceed the threshold — a high error rate deflates the
+    baseline's macro-F1 and invalidates the LoRA-vs-prompt comparison."""
+    rate = errors / n if n else 0.0
+    if rate > threshold:
+        raise RuntimeError(
+            f"baseline: {errors}/{n} ({rate:.1%}) items failed in transport (> {threshold:.0%}) — "
+            "the baseline macro-F1 would be deflated and the comparison invalid. "
+            "Lower LLM_RPM or check the provider, then re-run."
+        )
 _BASE_URL = os.environ.get("LLM_BASE_URL", "https://integrate.api.nvidia.com/v1")
 _MODEL = os.environ.get("LLM_MODEL", "meta/llama-3.3-70b-instruct")
 
@@ -86,6 +98,7 @@ def run_baseline(
     interval = _min_interval_ms() / 1000.0
     y_true, y_pred = [], []
     next_at = 0.0
+    errors = 0
     for i, e in enumerate(test):
         if interval:
             wait = next_at - time.monotonic()
@@ -96,12 +109,15 @@ def run_baseline(
         try:
             pred = parse_label(_classify_one(system, user), labels)
         except Exception as exc:  # network/5xx -> recorded as a miss, never aborts the run
-            print(f"  baseline item {i} error: {exc}")
+            print(f"  baseline item {i} transport error: {exc}")
+            errors += 1
             pred = UNMATCHED
         y_true.append(e.clause_type)
         y_pred.append(pred)
         if (i + 1) % 25 == 0:
             print(f"  baseline {i + 1}/{len(test)}")
+
+    error_guard(errors, len(test))
 
     report = ClfReport(
         name="prompted_baseline", model=_MODEL,
@@ -111,7 +127,8 @@ def run_baseline(
     out = out or (_REPO_ROOT / "evals" / "reports" / "clf_baseline.json")
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(report.model_dump_json(indent=2) + "\n", encoding="utf-8")
-    print(f"clf-baseline: macro_f1={report.macro_f1:.4f} accuracy={report.accuracy:.4f}")
+    print(f"clf-baseline: macro_f1={report.macro_f1:.4f} accuracy={report.accuracy:.4f} "
+          f"(transport_errors={errors})")
     return report
 
 

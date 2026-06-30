@@ -1,4 +1,6 @@
-from pipeline.classify.baseline import build_prompt, parse_label
+import pytest
+
+from pipeline.classify.baseline import build_prompt, error_guard, parse_label
 
 LABELS = ["Governing Law", "Cap On Liability", "Non-Compete"]
 
@@ -23,3 +25,13 @@ def test_parse_label_unmatched_returns_sentinel():
     out = parse_label("Some Other Category", LABELS)
     assert out not in LABELS  # a miss, never silently a valid label
     assert out == "__unmatched__"
+
+
+def test_error_guard_ok_at_or_below_threshold():
+    error_guard(0, 100)
+    error_guard(3, 100)  # exactly 3% — allowed (not strictly greater)
+
+
+def test_error_guard_raises_above_threshold():
+    with pytest.raises(RuntimeError):
+        error_guard(4, 100)  # 4% > 3%

@@ -35,8 +35,12 @@ def run_eval(data_dir: Path = CLF_DATA_DIR, model_dir: Path = MODEL_DIR) -> ClfR
     test = load_examples(data_dir / "test.jsonl")
 
     tok = AutoTokenizer.from_pretrained(str(model_dir))
+    cfg_path = model_dir / "adapter_config.json"
+    base_name = BASE_MODEL
+    if cfg_path.exists():
+        base_name = json.loads(cfg_path.read_text()).get("base_model_name_or_path") or BASE_MODEL
     base = AutoModelForSequenceClassification.from_pretrained(
-        BASE_MODEL, num_labels=len(labels), id2label=id2label,
+        base_name, num_labels=len(labels), id2label=id2label,
         label2id={lbl: i for i, lbl in enumerate(labels)},
     )
     model = PeftModel.from_pretrained(base, str(model_dir))
@@ -56,6 +60,7 @@ def run_eval(data_dir: Path = CLF_DATA_DIR, model_dir: Path = MODEL_DIR) -> ClfR
         per_class_f1=per_class_f1(y_true, y_pred, labels), n_test=len(test),
     )
     out = _REPO_ROOT / "evals" / "reports" / "clf_lora.json"
+    out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(report.model_dump_json(indent=2) + "\n", encoding="utf-8")
 
     baseline_path = _REPO_ROOT / "evals" / "reports" / "clf_baseline.json"
