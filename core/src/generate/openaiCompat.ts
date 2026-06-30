@@ -1,6 +1,7 @@
 import OpenAI from "openai";
 import { buildPrompt, parseRawGen } from "./prompt.js";
 import type { GenInput, Generator, RawGen } from "./types.js";
+import { reserveSlot, resolveMinIntervalMs } from "../llm/throttle.js";
 
 /** Minimal surface of the OpenAI chat client, so tests can inject a fake. */
 export interface ChatClient {
@@ -15,25 +16,8 @@ export interface ChatClient {
   };
 }
 
-/**
- * Minimum spacing (ms) between outgoing requests, to stay under a provider's
- * requests-per-minute cap (NIM free tier is 40 rpm). `LLM_MIN_INTERVAL_MS` is an
- * explicit override; otherwise it's derived from `LLM_RPM` (60000 / rpm). Unset or
- * invalid → 0 (no throttle), preserving existing behavior.
- */
-export function resolveMinIntervalMs(env: NodeJS.ProcessEnv = process.env): number {
-  const explicit = env.LLM_MIN_INTERVAL_MS;
-  if (explicit != null && explicit !== "") {
-    const ms = Number(explicit);
-    if (Number.isFinite(ms) && ms > 0) return Math.ceil(ms);
-  }
-  const rpm = env.LLM_RPM;
-  if (rpm != null && rpm !== "") {
-    const n = Number(rpm);
-    if (Number.isFinite(n) && n > 0) return Math.ceil(60000 / n);
-  }
-  return 0;
-}
+// Re-exported for back-compat: callers/tests still import this from openaiCompat.
+export { resolveMinIntervalMs } from "../llm/throttle.js";
 
 export function makeOpenAICompatGenerator(
   opts: { client?: ChatClient; model?: string; minIntervalMs?: number } = {},
@@ -46,19 +30,12 @@ export function makeOpenAICompatGenerator(
       apiKey: process.env.LLM_API_KEY ?? "",
     }) as unknown as ChatClient);
 
-  // Client-side rate limit: reserve a time slot per request so a fast serial loop
-  // (e.g. the eval runner) cannot exceed the provider's rpm cap and get 429'd.
+  // Client-side rate limit shared across all LLM callers via llm/throttle.
   const minIntervalMs = opts.minIntervalMs ?? resolveMinIntervalMs();
-  let nextAllowedAt = 0;
 
   return {
     async generate(input: GenInput): Promise<RawGen> {
-      if (minIntervalMs > 0) {
-        const slot = Math.max(Date.now(), nextAllowedAt);
-        nextAllowedAt = slot + minIntervalMs;
-        const wait = slot - Date.now();
-        if (wait > 0) await new Promise((resolve) => setTimeout(resolve, wait));
-      }
+      await reserveSlot(minIntervalMs);
       const { system, user } = buildPrompt(input);
       const resp = await client.chat.completions.create({
         model,

@@ -12,6 +12,7 @@ import { compareReports, formatDelta } from "./compare.js";
 import { makeRetriever } from "../retrieve/retrieve.js";
 import { makeGenerator } from "../generate/index.js";
 import { withClient } from "../db/client.js";
+import { AGENT_DEFAULTS } from "../agent/loop.js";
 
 const root = fileURLToPath(new URL("../../../", import.meta.url));
 const cmd = process.argv[2];
@@ -83,18 +84,27 @@ if (cmd === "derive") {
 
   const report = await runEval(items, deps, k);
 
-  // Provenance: provider/model match makeGenerator(); retrieve_mode/rerank_model/embed_model record config.
+  // Provenance: provider/model match makeGenerator(); retrieve_mode/rerank_model/embed_model/
+  // agent_max_rounds record config. rerank runs in both hybrid and agentic modes.
   const provider = process.env.LLM_PROVIDER ?? "openai";
   const model = process.env.LLM_MODEL ?? null;
-  const rerank_model = mode === "hybrid" ? (process.env.RERANK_MODEL ?? "Xenova/ms-marco-MiniLM-L-6-v2") : null;
+  const usesRerank = mode === "hybrid" || mode === "agentic";
+  const rerank_model = usesRerank ? (process.env.RERANK_MODEL ?? "Xenova/ms-marco-MiniLM-L-6-v2") : null;
   const embed_model = process.env.EMBED_MODEL ?? "bge-large-en-v1.5";
+  const agent_max_rounds = mode === "agentic" ? AGENT_DEFAULTS.MAX_ROUNDS : null;
 
-  // EVAL_OUT overrides the report filename so a benchmark run doesn't clobber baseline.json/p2a.json.
-  const outName = process.env.EVAL_OUT ?? (mode === "hybrid" ? "p2a.json" : "baseline.json");
+  // EVAL_OUT overrides the report filename so a benchmark run doesn't clobber an existing report.
+  const outName =
+    process.env.EVAL_OUT ??
+    (mode === "hybrid" ? "p2a.json" : mode === "agentic" ? "p2c.json" : "baseline.json");
   mkdirSync(`${root}evals/reports`, { recursive: true });
   writeFileSync(
     `${root}evals/reports/${outName}`,
-    JSON.stringify({ provider, model, retrieve_mode: mode, rerank_model, embed_model, ...report }, null, 2) + "\n",
+    JSON.stringify(
+      { provider, model, retrieve_mode: mode, rerank_model, embed_model, agent_max_rounds, ...report },
+      null,
+      2,
+    ) + "\n",
   );
 
   console.log(JSON.stringify({ retrieve_mode: mode, embed_model, k: report.k, total: report.total, aggregates: report.aggregates }, null, 2));
