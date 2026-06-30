@@ -7,7 +7,7 @@ import os
 from pathlib import Path
 
 from pipeline.classify.metrics import accuracy, macro_f1, per_class_f1
-from pipeline.classify.models import ClfReport, load_examples, load_label_map
+from pipeline.classify.models import ClfReport, load_examples, load_label_map, subsample_stratified
 
 _REPO_ROOT = Path(__file__).parents[3]
 CLF_DATA_DIR = _REPO_ROOT / "data" / "processed" / "cuad_clf"
@@ -33,6 +33,8 @@ def run_eval(data_dir: Path = CLF_DATA_DIR, model_dir: Path = MODEL_DIR) -> ClfR
     labels = load_label_map(data_dir / "label_map.json")
     id2label = dict(enumerate(labels))
     test = load_examples(data_dir / "test.jsonl")
+    _limit = int(os.environ["CLF_TEST_LIMIT"]) if os.environ.get("CLF_TEST_LIMIT") else None
+    test = subsample_stratified(test, _limit)
 
     tok = AutoTokenizer.from_pretrained(str(model_dir))
     cfg_path = model_dir / "adapter_config.json"

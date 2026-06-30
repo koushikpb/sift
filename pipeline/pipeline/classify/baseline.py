@@ -9,7 +9,7 @@ from pathlib import Path
 import requests
 
 from pipeline.classify.metrics import accuracy, macro_f1, per_class_f1
-from pipeline.classify.models import ClfReport, load_examples, load_label_map
+from pipeline.classify.models import ClfReport, load_examples, load_label_map, subsample_stratified
 
 UNMATCHED = "__unmatched__"
 _REPO_ROOT = Path(__file__).parents[3]
@@ -87,6 +87,8 @@ def run_baseline(
     labels = load_label_map(data_dir / "label_map.json")
     train = load_examples(data_dir / "train.jsonl")
     test = load_examples(data_dir / "test.jsonl")
+    _limit = int(os.environ["CLF_TEST_LIMIT"]) if os.environ.get("CLF_TEST_LIMIT") else None
+    test = subsample_stratified(test, _limit)
 
     # Fair baseline: a few in-context examples per class (drawn from TRAIN, never TEST).
     by_cls: dict[str, list[str]] = {}

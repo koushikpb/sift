@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import json
+import random
+from collections import defaultdict
 from pathlib import Path
 
 from pydantic import BaseModel, Field
@@ -44,3 +46,26 @@ def load_examples(path: str | Path) -> list[ClfExample]:
             if line.strip():
                 out.append(ClfExample.model_validate_json(line))
     return out
+
+
+def subsample_stratified(
+    examples: list[ClfExample], limit: int | None, seed: int = 42
+) -> list[ClfExample]:
+    """Deterministic stratified subsample to ~`limit` items, >= 1 per class. The same
+    (examples, limit, seed) always yields the same subset, so the baseline and the tuned
+    model can be scored on an identical reduced test set. limit None / >= len -> all."""
+    if not limit or limit >= len(examples):
+        return list(examples)
+    by_cls: dict[str, list[ClfExample]] = defaultdict(list)
+    for e in examples:
+        by_cls[e.clause_type].append(e)
+    n = len(examples)
+    rng = random.Random(seed)
+    picked: list[ClfExample] = []
+    for c in sorted(by_cls):
+        pool = sorted(by_cls[c], key=lambda e: (e.doc_id, e.text))
+        rng.shuffle(pool)
+        take = max(1, round(limit * len(by_cls[c]) / n))
+        picked.extend(pool[:take])
+    picked.sort(key=lambda e: (e.clause_type, e.doc_id, e.text))
+    return picked
