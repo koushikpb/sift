@@ -13,7 +13,7 @@ _REPO_ROOT = Path(__file__).parents[3]
 CLF_DATA_DIR = _REPO_ROOT / "data" / "processed" / "cuad_clf"
 MODEL_DIR = _REPO_ROOT / "models" / "cuad_clf"
 BASE_MODEL = os.environ.get("CLF_BASE_MODEL", "microsoft/deberta-v3-base")
-MAX_LEN = 256
+MAX_LEN = int(os.environ.get("CLF_MAX_LEN", "128"))  # must match train.py for a fair score
 
 
 def format_delta_table(baseline: ClfReport, lora: ClfReport) -> str:

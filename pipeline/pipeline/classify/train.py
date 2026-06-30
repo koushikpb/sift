@@ -12,7 +12,7 @@ _REPO_ROOT = Path(__file__).parents[3]
 CLF_DATA_DIR = _REPO_ROOT / "data" / "processed" / "cuad_clf"
 MODEL_DIR = _REPO_ROOT / "models" / "cuad_clf"
 BASE_MODEL = os.environ.get("CLF_BASE_MODEL", "microsoft/deberta-v3-base")
-MAX_LEN = 256
+MAX_LEN = int(os.environ.get("CLF_MAX_LEN", "128"))
 SEED = 42
 
 
@@ -39,8 +39,12 @@ def run_train(data_dir: Path = CLF_DATA_DIR, out_dir: Path = MODEL_DIR) -> None:
     tok = AutoTokenizer.from_pretrained(BASE_MODEL)
     train_ds, val_ds = to_ds("train"), to_ds("val")
 
+    # Pad every example to a fixed MAX_LEN so all batches share one [B, MAX_LEN] shape.
+    # With per-batch dynamic padding, each new sequence length is a new tensor shape and MPS
+    # recompiles the graph almost every step (~15-30s stalls -> ~21h). A fixed shape compiles
+    # once -> ~0.5s/step. Clauses are short (median 39 tok, 91.5% <= 128), so 128 truncates few.
     def tok_fn(batch):
-        return tok(batch["text"], truncation=True, max_length=MAX_LEN)
+        return tok(batch["text"], truncation=True, padding="max_length", max_length=MAX_LEN)
 
     train_ds = train_ds.map(tok_fn, batched=True)
     val_ds = val_ds.map(tok_fn, batched=True)
@@ -50,10 +54,16 @@ def run_train(data_dir: Path = CLF_DATA_DIR, out_dir: Path = MODEL_DIR) -> None:
     )
     # DeBERTa attention proj names; for roberta/bert use ["query","value"].
     target = os.environ.get("CLF_LORA_TARGETS", "query_proj,value_proj").split(",")
+    # deberta-v3 is an MLM checkpoint: its SEQ_CLS pooler.dense + classifier are
+    # randomly initialized (absent from the base weights). Both MUST be trained and
+    # saved with the adapter, else eval re-inits a *different* random pooler and the
+    # LoRA model scores near-random — silently invalidating the before/after gate.
+    # (roberta/bert have no separate `pooler` in the head; override via CLF_SAVE_MODULES.)
+    save_modules = os.environ.get("CLF_SAVE_MODULES", "classifier,pooler").split(",")
     peft_model = get_peft_model(
         model,
         LoraConfig(task_type=TaskType.SEQ_CLS, r=16, lora_alpha=32, lora_dropout=0.1,
-                   target_modules=target),
+                   target_modules=target, modules_to_save=save_modules),
     )
     peft_model.print_trainable_parameters()
 
