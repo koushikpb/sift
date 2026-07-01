@@ -42,11 +42,11 @@ describe("agent eval metrics", () => {
     expect(taskSuccess(item, result({ refused: false }))).toBe(false);
   });
 
-  it("trajectoryValid: refusal items stop after retrieve_clause; answerable items reach flag_risks", () => {
+  it("trajectoryValid: refusal items refuse; answerable items retrieve + check_playbook", () => {
     const refItem = base({ grader: "refusal" });
-    expect(trajectoryValid(refItem, result({ refused: true, trajectory: ["retrieve_clause"] }))).toBe(true);
+    expect(trajectoryValid(refItem, result({ refused: true, trajectory: ["retrieve_clause", "check_playbook", "export_memo"] }))).toBe(true);
     const flagItem = base({ grader: "flag_match" });
-    expect(trajectoryValid(flagItem, result({ trajectory: ["retrieve_clause", "classify_clause", "flag_risks", "export_memo"] }))).toBe(true);
-    expect(trajectoryValid(flagItem, result({ trajectory: ["retrieve_clause"] }))).toBe(false);
+    expect(trajectoryValid(flagItem, result({ refused: false, trajectory: ["retrieve_clause", "check_playbook", "flag_risks", "export_memo"] }))).toBe(true);
+    expect(trajectoryValid(flagItem, result({ refused: true, trajectory: ["retrieve_clause", "check_playbook", "export_memo"] }))).toBe(false);
   });
 });

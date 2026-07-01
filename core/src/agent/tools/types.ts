@@ -19,7 +19,10 @@ export const ClauseClassificationSchema = z
   .strict();
 export type ClauseClassification = z.infer<typeof ClauseClassificationSchema>;
 
-/** A playbook position surfaced against a clause. deviation=true means a red-flag / non-standard term. */
+/**
+ * A playbook position surfaced against a clause. deviation=true means a red-flag / non-standard
+ * term. citation is null only for a missing-required-clause finding (grounded in absence).
+ */
 export const ReviewFlagSchema = z
   .object({
     playbook_id: z.string().min(1),
@@ -27,7 +30,7 @@ export const ReviewFlagSchema = z
     severity: Severity,
     deviation: z.boolean(),
     rationale: z.string(),
-    citation: CitationSchema,
+    citation: CitationSchema.nullable(),
   })
   .strict();
 export type ReviewFlag = z.infer<typeof ReviewFlagSchema>;

@@ -94,7 +94,8 @@ export function defaultDeviationJudge(): DeviationJudge {
         const start = text.indexOf("{");
         const parsed = VerdictSchema.parse(JSON.parse(text.slice(start, text.lastIndexOf("}") + 1)));
         return { deviation: parsed.deviation, rationale: parsed.rationale };
-      } catch {
+      } catch (e) {
+        process.stderr.write(`flag_risks: deviation judge failed, degrading to no-deviation: ${e instanceof Error ? e.message : String(e)}\n`);
         return { deviation: false, rationale: "deviation judge unavailable (degraded to no-deviation)" };
       }
     },

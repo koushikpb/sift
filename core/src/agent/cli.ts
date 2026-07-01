@@ -36,6 +36,7 @@ async function main(): Promise<void> {
   const redline = defaultRedlineWriter();
 
   const reviewDeps = {
+    playbook: entries,
     retrieveClause: makeRetrieveClauseTool({ retrieve, generate: gen.generate.bind(gen) }),
     classifyClause: makeClassifyClauseTool({ runPredict: defaultRunPredict }),
     flagRisks: makeFlagRisksTool({ judge: judge.judge }, entries),

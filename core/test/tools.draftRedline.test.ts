@@ -15,4 +15,9 @@ describe("draft_redline tool", () => {
     expect(rl.original).toEqual(flag.citation);
     expect(rl.suggested_text).toMatch(/three/i);
   });
+
+  it("declares itself a read tool", () => {
+    const tool = makeDraftRedlineTool({ suggest: async () => "x" });
+    expect(tool.sideEffect).toBe("read");
+  });
 });

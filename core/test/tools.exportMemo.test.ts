@@ -41,4 +41,9 @@ describe("export_memo tool (HITL gate)", () => {
     expect(md).toContain("Governing Law");
     expect(md).toContain("high");
   });
+
+  it("renders a missing-clause flag (null citation) as missing", () => {
+    const md = renderMemoMarkdown({ ...memo, flags: [{ playbook_id: "return_of_materials", clause_type: "Return or Destruction", severity: "low", deviation: true, rationale: "absent", citation: null }] });
+    expect(md).toContain("clause not found — missing");
+  });
 });

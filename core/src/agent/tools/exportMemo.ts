@@ -42,7 +42,10 @@ export function renderMemoMarkdown(memo: ReviewMemo): string {
   lines.push("", "## Flags");
   if (memo.flags.length === 0) lines.push("_none_");
   for (const fl of memo.flags) {
-    lines.push(`- **${fl.playbook_id}** (${fl.severity}${fl.deviation ? ", DEVIATION" : ""}): ${fl.rationale} _(chars ${fl.citation.char_start}-${fl.citation.char_end})_`);
+    const loc = fl.citation
+      ? ` _(chars ${fl.citation.char_start}-${fl.citation.char_end})_`
+      : " _(clause not found — missing)_";
+    lines.push(`- **${fl.playbook_id}** (${fl.severity}${fl.deviation ? ", DEVIATION" : ""}): ${fl.rationale}${loc}`);
   }
   lines.push("", "## Proposed redlines");
   if (memo.redlines.length === 0) lines.push("_none_");

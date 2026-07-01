@@ -14,13 +14,14 @@ const entries = loadPlaybook(fileURLToPath(new URL("../../evals/playbook/nda.yam
 const cand: Candidate = { node_id: "n0", doc_id: "d1", type: "s", number: null, heading: null, text: "law of Delaware", char_start: 5, char_end: 20, score: 1 };
 
 const items: EvalItem[] = [
-  { id: "flag1", doc_id: "d1", source: "cuad", contract_type: "nda", category: "deviated", objective: "gov law",
+  { id: "flag1", doc_id: "d1", source: "cuad", contract_type: "nda", category: "deviated", objective: "Find the governing law clause (playbook requires governing_law)",
     expected_fields: [], expected_flags: [{ playbook_id: "governing_law", severity: "low" }], gold_spans: [], grader: "flag_match", notes: "" },
 ];
 
 function deps() {
   const writes: string[] = [];
   return { writes, deps: {
+    playbook: entries,
     retrieveClause: makeRetrieveClauseTool({ retrieve: async () => [cand], generate: async () => ({ answer: "Delaware", supporting: [0], refused: false, refusal_reason: null }) }),
     classifyClause: makeClassifyClauseTool({ runPredict: async (t) => t.map((x) => ({ text: x, label: "Governing Law", score: 0.9 })) }),
     flagRisks: makeFlagRisksTool({ judge: async () => ({ deviation: true, rationale: "foreign law" }) }, entries),

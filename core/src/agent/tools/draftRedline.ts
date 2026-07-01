@@ -1,6 +1,6 @@
 import { z } from "zod";
 import OpenAI from "openai";
-import type { ReviewFlag, RedlineProposal, ToolDef } from "./types.js";
+import type { Citation, ReviewFlag, RedlineProposal, ToolDef } from "./types.js";
 import { reserveSlot, resolveMinIntervalMs } from "../../llm/throttle.js";
 
 export interface RedlineWriter {
@@ -8,7 +8,7 @@ export interface RedlineWriter {
 }
 
 export interface DraftRedlineInput {
-  flag: ReviewFlag;
+  flag: ReviewFlag & { citation: Citation };
   clause_text: string;
 }
 
@@ -66,7 +66,8 @@ export function defaultRedlineWriter(): RedlineWriter {
           ],
         });
         return (resp.choices[0]?.message?.content ?? "").trim() || `Revise to satisfy: ${flag.rationale}`;
-      } catch {
+      } catch (e) {
+        process.stderr.write(`draft_redline: LLM writer failed, using fallback text: ${e instanceof Error ? e.message : String(e)}\n`);
         return `Revise to satisfy playbook position ${flag.playbook_id}: ${flag.rationale}`;
       }
     },

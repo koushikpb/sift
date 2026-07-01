@@ -33,6 +33,11 @@ describe("tool artifact schemas", () => {
     expect(ReviewMemoSchema.parse(memo)).toEqual(memo);
   });
 
+  it("ReviewFlag allows a null citation (missing-required-clause finding)", () => {
+    const missing = { playbook_id: "return_of_materials", clause_type: "Return or Destruction", severity: "low", deviation: true, rationale: "absent", citation: null };
+    expect(ReviewFlagSchema.parse(missing).citation).toBeNull();
+  });
+
   it("schemas are strict (reject unknown keys)", () => {
     expect(() => ReviewFlagSchema.parse({ playbook_id: "x", clause_type: "y", severity: "low", deviation: false, rationale: "", citation: cite, extra: 1 })).toThrow();
   });

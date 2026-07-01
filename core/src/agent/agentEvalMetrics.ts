@@ -29,9 +29,10 @@ export function taskSuccess(item: EvalItem, result: ReviewResult): boolean {
   }
 }
 
-/** Refusal items should stop after retrieval; answerable items should reach flag_risks. */
+/** Refusal items must refuse (no flagging). Answerable items must retrieve + run check_playbook and produce a finding. */
 export function trajectoryValid(item: EvalItem, result: ReviewResult): boolean {
-  if (item.grader === "refusal") return result.refused && result.trajectory[0] === "retrieve_clause" && !result.trajectory.includes("flag_risks");
-  if (result.refused) return true; // an answerable item that legitimately refused still has a valid (short) trajectory
-  return result.trajectory.includes("retrieve_clause") && result.trajectory.includes("flag_risks");
+  if (item.grader === "refusal") {
+    return result.refused && result.trajectory[0] === "retrieve_clause" && !result.trajectory.includes("flag_risks");
+  }
+  return !result.refused && result.trajectory.includes("retrieve_clause") && result.trajectory.includes("check_playbook");
 }
