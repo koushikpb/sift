@@ -19,6 +19,9 @@ dist/
 /data/raw/
 /data/processed/
 
+# Review memos written by export_memo (human artifacts, not source)
+/data/reviews/
+
 # OS
 .DS_Store
 
