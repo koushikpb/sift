@@ -54,6 +54,12 @@ eval-derive:
 eval-validate:
 	cd core && npm run eval -- validate
 
+.PHONY: mcp-serve agent-eval
+mcp-serve:
+	cd core && npm run mcp
+agent-eval:
+	cd core && npm run agent-eval
+
 .PHONY: verify-p0
 verify-p0: db-up migrate
 	@echo "== 1/3 parser hierarchy gate (10 contracts) =="
