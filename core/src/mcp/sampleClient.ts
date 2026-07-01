@@ -11,7 +11,13 @@ async function main(): Promise<void> {
   process.stdout.write("tools: " + tools.tools.map((t) => t.name).join(", ") + "\n");
 
   const docId = process.argv[2] ?? "cuad_limeenergyco-09-09-1999-ex-10-distributor-agreement";
-  const res = await client.callTool({ name: "retrieve_clause", arguments: { objective: "Find the governing law clause", doc_id: docId } });
+  // Raise the per-call timeout above the SDK's 60s default: a cold retrieve_clause loads the
+  // embedding model and makes a throttled NIM call, which can exceed 60s on first use.
+  const res = await client.callTool(
+    { name: "retrieve_clause", arguments: { objective: "Find the governing law clause", doc_id: docId } },
+    undefined,
+    { timeout: 180000 },
+  );
   process.stdout.write("retrieve_clause -> " + JSON.stringify(res.content) + "\n");
 
   await client.close();
