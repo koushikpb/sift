@@ -2,6 +2,38 @@
 
 Architectural decisions, kept current as they are made. Newest first.
 
+## 2026-06-30 — Phase 3: Prompt → RAG → Fine-tune decision (Layer 2 clause classifier)
+- **Decision: ADOPT the LoRA-fine-tuned clause classifier over the prompted baseline.** The
+  before/after was run on an *identical* 371-item stratified CUAD test subset (37 classes),
+  with the metric-to-beat declared in advance: **adopt iff LoRA macro-F1 ≥ prompted baseline
+  + 0.05.** Result: prompted (few-shot `meta/llama-3.3-70b-instruct`) macro-F1 **0.6657** /
+  acc 0.7439 → LoRA (Legal-BERT) macro-F1 **0.7177** (**+0.0520**, clears the bar) / acc
+  **0.8356** (**+0.0916**). Full report: `docs/eval-reports/P3.md`.
+- **Why this is a genuine adopt, not a coin-flip.** The macro-F1 win is thin (+0.0020 over the
+  +0.05 bar) and within sampling noise on a 371-item / 37-class subset; the decisive, robust
+  evidence is the +0.0916 accuracy gain and the *breadth* of per-class improvement (most
+  classes up, few tied, one rare class regressed). Prompting was exhausted first (a strong 70B
+  few-shot baseline with per-class in-context examples) before fine-tuning was chosen — the
+  fine-tune earned its place rather than being assumed.
+- **Base model: Legal-BERT (`nlpaueb/legal-bert-base-uncased`), not DeBERTa-v3-base.** Two
+  reasons: (1) DeBERTa-v3's disentangled attention falls back to CPU on Apple MPS, projecting
+  ~21 h to train here, while Legal-BERT uses standard attention (native MPS, ~50 min);
+  (2) Legal-BERT is the SPEC-recommended legal-domain encoder. Swappable via `CLF_BASE_MODEL`
+  (+ `CLF_LORA_TARGETS`, `CLF_SAVE_MODULES` for non-DeBERTa attention/head names).
+- **Train the SEQ_CLS pooler, not just the classifier.** MLM checkpoints (DeBERTa-v3,
+  Legal-BERT) ship no classification `pooler.dense`; it is randomly initialized at load. PEFT's
+  default `modules_to_save` for SEQ_CLS covers only the classifier, leaving the pooler frozen at
+  random init *and* unsaved — so eval would re-init a different random pooler and the LoRA would
+  score near-random, silently invalidating the gate. Fix: `modules_to_save=["classifier",
+  "pooler"]` so both are trained and round-trip to eval.
+- **Fixed-length padding (`MAX_LEN=128`) for training.** Per-batch dynamic padding makes every
+  new sequence length a new MPS graph (recompile stalls of 14–29 s/step → ~21 h). A fixed shape
+  compiles once (~0.5 s/step). Clauses are short (median 39 tok, 91.5% ≤ 128); train and eval
+  share `MAX_LEN` so the score stays fair.
+- **Cost-bounded but fair test set.** `CLF_TEST_LIMIT` takes a deterministic seeded stratified
+  subsample (≥1/class) used identically by baseline and eval, bounding NIM calls (~10 min vs
+  ~1 h on the full 2197-item test) without biasing the comparison.
+
 ## 2026-06-24 — Phase 0 foundations
 - **CUAD sourced from `theatticusproject/cuad`'s `CUAD_v1.json` (SQuAD format), not `cuad-qa`.** The `theatticusproject/cuad-qa` HF dataset is script-based and `datasets`>=3 refuses to run dataset scripts; the plain `CUAD_v1.json` file is downloaded directly and flattened to the flat-record shape `normalize_cuad` expects.
 - **Hybrid language split.** Python (`pipeline/`) owns ingestion + the structure-aware
