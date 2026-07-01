@@ -29,11 +29,17 @@ Architectural decisions, kept current as they are made. Newest first.
 - **Bounded LLM timeout + retry on all NIM clients** (`LLM_TIMEOUT_MS`, default 45s; `maxRetries:1`).
   Without it the OpenAI SDK waits ~10 min on a stalled NIM connection and hangs eval runs; a finite
   timeout lets a stall fail fast so the per-item degrade path continues.
-- **Gate model substitution: `llama-3.1-70b-instruct`.** The configured `llama-3.3-70b-instruct` was
-  inference-unavailable on NIM at gate time (NIM `/models` 200/0.13s, but its `/chat/completions`
-  returned 0 bytes/25–30s repeatedly); the comparable 70B `llama-3.1` responded in ~1.5s. P4's gate
-  tests the action agent, not a specific model, so a comparable working 70B is a fair substitution.
-  A clean re-run on `llama-3.3-70b` when NIM is stable would tighten the headline numbers.
+- **Gate model substitution: `llama-3.1-70b-instruct`.** At gate time `llama-3.3-70b-instruct`
+  returned 0 bytes/25–30s repeatedly, so the gate ran on the comparable 70B `llama-3.1` (~7s). P4's
+  gate tests the action agent, not a specific model, so a working comparable 70B is a fair
+  substitution. **Post-gate follow-up corrected the root cause:** `llama-3.3-70b` was not down but
+  **capacity-queued** on the shared free tier — probing with a long timeout, a one-token prompt
+  returned HTTP 200 (`"ok"`) with time-to-first-byte == total == ~114s (pure queue wait, not
+  inference; `stream`/`max_tokens` got 0 bytes for the whole window), variable 100–150s+, while
+  `/models` stayed 200/0.13s and `llama-3.1-70b` answered in ~7s on the same key. Matches NVIDIA's
+  documented free tier (40 RPM, no SLA; requests queue/"hang" under load). A clean re-run off-peak,
+  or staying on `llama-3.1-70b`, tightens the headline numbers; the `0-bytes-then-timeout` symptom is
+  a capacity signal, not an outage. Full evidence: `docs/eval-reports/P4.md` § NIM capacity queueing.
 
 ## 2026-06-30 — Phase 3: Prompt → RAG → Fine-tune decision (Layer 2 clause classifier)
 - **Decision: ADOPT the LoRA-fine-tuned clause classifier over the prompted baseline.** The
