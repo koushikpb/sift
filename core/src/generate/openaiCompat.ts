@@ -1,7 +1,7 @@
 import OpenAI from "openai";
 import { buildPrompt, parseRawGen } from "./prompt.js";
 import type { GenInput, Generator, RawGen } from "./types.js";
-import { reserveSlot, resolveMinIntervalMs } from "../llm/throttle.js";
+import { reserveSlot, resolveMinIntervalMs, resolveTimeoutMs } from "../llm/throttle.js";
 
 /** Minimal surface of the OpenAI chat client, so tests can inject a fake. */
 export interface ChatClient {
@@ -28,6 +28,8 @@ export function makeOpenAICompatGenerator(
     (new OpenAI({
       baseURL: process.env.LLM_BASE_URL ?? "https://integrate.api.nvidia.com/v1",
       apiKey: process.env.LLM_API_KEY ?? "",
+      timeout: resolveTimeoutMs(),
+      maxRetries: 1,
     }) as unknown as ChatClient);
 
   // Client-side rate limit shared across all LLM callers via llm/throttle.

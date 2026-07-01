@@ -27,6 +27,21 @@ export function resolveMinIntervalMs(env: NodeJS.ProcessEnv = process.env): numb
 }
 
 /**
+ * Per-request timeout (ms) for LLM HTTP clients. `LLM_TIMEOUT_MS` overrides; default 45000.
+ * Without a bounded timeout the OpenAI SDK waits ~10 min on a stalled connection (a known NIM
+ * stall mode), which hangs eval runs — a finite timeout lets a stalled call fail fast so the
+ * per-item degrade path can continue. Non-positive/invalid → the default.
+ */
+export function resolveTimeoutMs(env: NodeJS.ProcessEnv = process.env): number {
+  const explicit = env.LLM_TIMEOUT_MS;
+  if (explicit != null && explicit !== "") {
+    const ms = Number(explicit);
+    if (Number.isFinite(ms) && ms > 0) return Math.ceil(ms);
+  }
+  return 45000;
+}
+
+/**
  * Reserve the next outgoing-request time slot; resolves after waiting if needed.
  * Shared across all callers in the process. `minIntervalMs <= 0` returns immediately
  * WITHOUT advancing the clock, so the no-throttle path is byte-for-byte unchanged.

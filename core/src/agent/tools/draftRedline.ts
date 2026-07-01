@@ -1,7 +1,7 @@
 import { z } from "zod";
 import OpenAI from "openai";
 import type { Citation, ReviewFlag, RedlineProposal, ToolDef } from "./types.js";
-import { reserveSlot, resolveMinIntervalMs } from "../../llm/throttle.js";
+import { reserveSlot, resolveMinIntervalMs, resolveTimeoutMs } from "../../llm/throttle.js";
 
 export interface RedlineWriter {
   suggest: (flag: ReviewFlag, clauseText: string) => Promise<string>;
@@ -51,6 +51,8 @@ export function defaultRedlineWriter(): RedlineWriter {
   const client = new OpenAI({
     baseURL: process.env.LLM_BASE_URL ?? "https://integrate.api.nvidia.com/v1",
     apiKey: process.env.LLM_API_KEY ?? "",
+    timeout: resolveTimeoutMs(),
+    maxRetries: 1,
   });
   const minIntervalMs = resolveMinIntervalMs();
   return {

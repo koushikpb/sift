@@ -3,7 +3,7 @@ import OpenAI from "openai";
 import type { PlaybookEntry } from "../../eval/playbook.js";
 import type { Citation, ReviewFlag, ToolDef } from "./types.js";
 import { matchPlaybookEntry } from "./playbookMatch.js";
-import { reserveSlot, resolveMinIntervalMs } from "../../llm/throttle.js";
+import { reserveSlot, resolveMinIntervalMs, resolveTimeoutMs } from "../../llm/throttle.js";
 
 export interface DeviationJudge {
   judge: (clauseText: string, entry: PlaybookEntry) => Promise<{ deviation: boolean; rationale: string }>;
@@ -71,6 +71,8 @@ export function defaultDeviationJudge(): DeviationJudge {
   const client = new OpenAI({
     baseURL: process.env.LLM_BASE_URL ?? "https://integrate.api.nvidia.com/v1",
     apiKey: process.env.LLM_API_KEY ?? "",
+    timeout: resolveTimeoutMs(),
+    maxRetries: 1,
   });
   const minIntervalMs = resolveMinIntervalMs();
   return {
