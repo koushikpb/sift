@@ -75,13 +75,13 @@ export function defaultDeviationJudge(): DeviationJudge {
   const minIntervalMs = resolveMinIntervalMs();
   return {
     async judge(clauseText, entry) {
-      await reserveSlot(minIntervalMs);
       const system =
         "You are a contract-review assistant. Decide ONLY from the clause text whether it deviates from the standard position. " +
         'Reply with ONLY JSON: {"deviation": boolean, "rationale": string}. If uncertain, deviation=false.';
       const user =
         `Playbook position: ${entry.standard_position}\nRed flags: ${entry.red_flags.join("; ")}\n\nClause:\n${clauseText}`;
       try {
+        await reserveSlot(minIntervalMs);
         const resp = await client.chat.completions.create({
           model,
           temperature: 0,

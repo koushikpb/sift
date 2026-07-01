@@ -10,8 +10,9 @@ describe("matchPlaybookEntry", () => {
     expect(matchPlaybookEntry("governing law", entries)?.playbook_id).toBe("governing_law");
   });
   it("matches via the synonyms map when the label differs from the playbook wording", () => {
-    // CUAD's "Anti-Assignment" is not a playbook clause_type; a governing-law synonym still resolves.
-    expect(matchPlaybookEntry("Governing Law", entries)?.playbook_id).toBe("governing_law");
+    // "Confidential Information" has no direct playbook clause_type (that entry is
+    // "Definition of Confidential Information"); it resolves ONLY through the synonym map.
+    expect(matchPlaybookEntry("Confidential Information", entries)?.playbook_id).toBe("definition_scope");
   });
   it("returns null for a clause type with no playbook position", () => {
     expect(matchPlaybookEntry("Volume Restriction", entries)).toBeNull();
