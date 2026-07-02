@@ -1,7 +1,7 @@
 import OpenAI from "openai";
 import { buildPrompt, parseRawGen } from "./prompt.js";
 import type { GenInput, Generator, RawGen } from "./types.js";
-import { reserveSlot, resolveMinIntervalMs, resolveTimeoutMs } from "../llm/throttle.js";
+import { reserveSlot, resolveMinIntervalMs, resolveTimeoutMs, resolveMaxTokens } from "../llm/throttle.js";
 
 /** Minimal surface of the OpenAI chat client, so tests can inject a fake. */
 export interface ChatClient {
@@ -11,6 +11,7 @@ export interface ChatClient {
         model: string;
         messages: { role: "system" | "user"; content: string }[];
         temperature?: number;
+        max_tokens?: number;
       }): Promise<{ choices: { message: { content: string | null } }[] }>;
     };
   };
@@ -42,6 +43,7 @@ export function makeOpenAICompatGenerator(
       const resp = await client.chat.completions.create({
         model,
         temperature: 0,
+        max_tokens: resolveMaxTokens(),
         messages: [
           { role: "system", content: system },
           { role: "user", content: user },

@@ -28,6 +28,18 @@ describe("makeOpenAICompatGenerator", () => {
     expect(raw.refused).toBe(true);
   });
 
+  it("passes max_tokens to the chat client", async () => {
+    const seen: Record<string, unknown> = {};
+    const create = vi.fn().mockImplementation(async (args: unknown) => {
+      Object.assign(seen, args as object);
+      return { choices: [{ message: { content: '{"answer":"x","supporting":[0],"refused":false}' } }] };
+    });
+    const gen = makeOpenAICompatGenerator({ client: { chat: { completions: { create } } }, model: "claude-sonnet-4-6" });
+    await gen.generate({ objective: "What law?", candidates: cands });
+    expect(typeof seen.max_tokens).toBe("number");
+    expect((seen.max_tokens as number)).toBeGreaterThan(0);
+  });
+
   it("paces successive requests by at least minIntervalMs", async () => {
     const callTimes: number[] = [];
     const create = vi.fn().mockImplementation(async () => {

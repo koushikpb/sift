@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { reserveSlot, resolveMinIntervalMs, __resetThrottle } from "../src/llm/throttle.js";
+import { reserveSlot, resolveMinIntervalMs, resolveMaxTokens, __resetThrottle } from "../src/llm/throttle.js";
 
 describe("reserveSlot", () => {
   beforeEach(() => __resetThrottle());
@@ -26,6 +26,29 @@ describe("reserveSlot", () => {
     const start = Date.now();
     await Promise.all([reserveSlot(50), reserveSlot(50), reserveSlot(50)]);
     expect(Date.now() - start).toBeGreaterThanOrEqual(90);
+  });
+});
+
+describe("resolveMaxTokens", () => {
+  it("returns fallback when LLM_MAX_TOKENS is unset", () => {
+    expect(resolveMaxTokens(2048, {})).toBe(2048);
+  });
+
+  it("returns 1024 default when no fallback and LLM_MAX_TOKENS unset", () => {
+    expect(resolveMaxTokens(undefined, {})).toBe(1024);
+  });
+
+  it("reads LLM_MAX_TOKENS over fallback", () => {
+    expect(resolveMaxTokens(2048, { LLM_MAX_TOKENS: "512" })).toBe(512);
+  });
+
+  it("falls back when LLM_MAX_TOKENS is non-numeric", () => {
+    expect(resolveMaxTokens(2048, { LLM_MAX_TOKENS: "bad" })).toBe(2048);
+  });
+
+  it("falls back when LLM_MAX_TOKENS is zero or negative", () => {
+    expect(resolveMaxTokens(2048, { LLM_MAX_TOKENS: "0" })).toBe(2048);
+    expect(resolveMaxTokens(2048, { LLM_MAX_TOKENS: "-100" })).toBe(2048);
   });
 });
 
