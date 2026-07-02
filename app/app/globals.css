@@ -5,6 +5,13 @@
   --foreground: #e6e8ee;
   --accent: #6d6afc;
   --muted: #9aa3b2;
+  /* Semantic status colors (distinct from --accent, which is reserved for interactive/brand
+     elements). Contrast-checked against --background (#0b0d12): danger 7.03:1, warning 11.64:1,
+     success 11.15:1 — all clear WCAG AA (4.5:1) with margin for AAA. Used for severity/deviation
+     signaling, always paired with a text label + icon (never color alone). */
+  --danger: #f87171;
+  --warning: #fbbf24;
+  --success: #4ade80;
 }
 
 @theme inline {
@@ -12,4 +19,7 @@
   --color-foreground: var(--foreground);
   --color-accent: var(--accent);
   --color-muted: var(--muted);
+  --color-danger: var(--danger);
+  --color-warning: var(--warning);
+  --color-success: var(--success);
 }
