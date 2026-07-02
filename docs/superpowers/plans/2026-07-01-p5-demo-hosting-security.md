@@ -452,6 +452,9 @@ Deliverable: no unpatched high/critical, or a documented justification.
 
 ## Task 11: Vercel deploy
 
+> **DEFERRED TO P6 (user decision, 2026-07-02):** P5 merges code-complete without the deploy;
+> this task and its deploy-time checks moved to `docs/P6-scope.md`.
+
 **Files:**
 - Create: `app/vercel.json`
 - Modify: `README.md` (deploy + seed steps)
