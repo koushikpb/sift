@@ -225,6 +225,10 @@ import "./globals.css";
 
 ## Task 3: Landing / hero page (recreate the Agent-AI template, our liberties)
 
+> **REMOVED (user decision, 2026-07-01):** the demo is the agent page only — no landing page.
+> Implemented as `6961f30`, reverted in `69543b8` (kept: `Button.tsx`, Inter layout wiring,
+> vitest jest-dom setup). Task 6's review UI now lives at `/` (`app/app/page.tsx`).
+
 **Design source:** Agent-AI template (Next + Tailwind v4) + UI/UX Pro Max skill. Not a pixel copy.
 
 **Files:**
@@ -337,7 +341,7 @@ export const maxDuration = 60; // Vercel Pro; streaming keeps the connection ali
 **Design source:** template + UI/UX Pro Max, consistent with the landing.
 
 **Files:**
-- Create: `app/app/review/page.tsx` (client; consumes `/api/review` via `EventSource`, mirroring the current `page.tsx`)
+- Modify: `app/app/page.tsx` → the review UI at `/` (client; consumes `/api/review` via `EventSource`, replacing the interim form UI — the app's only page, per the Task-3 removal decision)
 - Create: `app/src/components/review/{ClauseCard,CitationHighlight,SeverityBadge,RefusalNotice,DocPicker}.tsx`
 - Test: `app/src/components/review/CitationHighlight.test.tsx`
 
@@ -360,7 +364,7 @@ test("highlights exactly the cited span", () => {
 - [ ] **Step 2: Run — FAIL.**
 - [ ] **Step 3: Implement `CitationHighlight`** (slice-and-wrap; no fuzzy matching). Run — PASS.
 - [ ] **Step 4: Implement `ClauseCard`** (objective, LoRA label via `SeverityBadge`, flag + severity, redline if present, `CitationHighlight`; refusal → `RefusalNotice`) + `DocPicker` (curated docs).
-- [ ] **Step 5: Implement `review/page.tsx`** — `DocPicker` + objective input, open `EventSource('/api/review?...')`, append `clause` cards as they stream, handle `status`/`error`/`done` exactly like the current page.
+- [ ] **Step 5: Implement the review UI in `page.tsx` (at `/`)** — `DocPicker` + objective input, open `EventSource('/api/review?...')`, append `clause` cards as they stream, handle `status`/`error`/`done` exactly like the current page.
 - [ ] **Step 6: End-to-end check** in the browser against a curated NDA; verify highlights + refusals; `npm -w @sift/app run build`.
 - [ ] **Step 7: Commit.** `feat(app): review view — clause cards, citation highlighting, refusals`
 
@@ -461,8 +465,8 @@ Deliverable: no unpatched high/critical, or a documented justification.
   `LLM_API_KEY` (Anthropic), `LLM_MAX_TOKENS`, `DATABASE_URL` (Neon), `RETRIEVE_MODE=hybrid`, Upstash creds.
   (Human-run in the Vercel dashboard; keys never printed.)
 - [ ] **Step 4: Deploy** (connect repo or `vercel --prod`); confirm the build transpiles `@sift/core`.
-- [ ] **Step 5: Smoke the public URL** — landing loads; `/review` streams a grounded, cited review of a
-  curated NDA; memo stays gated; rate limit + headers active.
+- [ ] **Step 5: Smoke the public URL** — the agent page at `/` loads and streams a grounded, cited
+  review of a curated NDA; memo stays gated; rate limit + headers active.
 - [ ] **Step 6: Commit.** `chore(app): vercel deploy config`
 
 ---
@@ -471,8 +475,9 @@ Deliverable: no unpatched high/critical, or a documented justification.
 
 - [ ] **Step 1: README** — architecture diagram (3 layers + MCP + demo), the before/after eval numbers
   (P3 + P4 gate), the live demo link, and local-run instructions.
-- [ ] **Step 2: In-app "How it works"** — ensure the grounding invariant, refusal, and HITL story read
-  clearly (reuse the landing section).
+- [ ] **Step 2: "How it works" narrative lives in the README** (grounding invariant, refusal, HITL) —
+  no separate in-app page (single-page demo per the Task-3 removal decision); at most a one-line
+  explainer on the agent page.
 - [ ] **Step 3: Demo GIF / short walkthrough** (human-recorded) embedded in the README.
 - [ ] **Step 4: Commit.** `docs: README + demo narrative for P5`
 Deliverable: resume-ready repo + public link.
