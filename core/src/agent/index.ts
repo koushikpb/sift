@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { existsSync } from "node:fs";
+import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { ClauseCard } from "../schemas/clauseCard.js";
 import { loadPlaybook } from "../eval/playbook.js";
@@ -18,22 +20,51 @@ import type { Citation, ClauseClassification, ToolDef } from "./tools/types.js";
 export { reviewContract };
 export type { ReviewDeps, ReviewResult };
 
-// PLAYBOOK_PATH lets a deployer override playbook resolution outright (checked first). This is
-// not just a defensive fallback for app/: when this module is bundled by Next.js webpack
-// (transpilePackages: ["@sift/core"], see app/next.config.mjs), webpack treats
-// `new URL(literal, import.meta.url)` as a static-asset import and rewrites it to a *single*-arg
-// `new URL("static/media/nda.<hash>.yaml")` call — dropping import.meta.url entirely. Verified by
-// inspecting `app/.next/server/chunks/*.js` after `npm -w @sift/app run build`: the compiled
-// output is `new c.U(c(98995))` where module 98995 just returns `c.p + "static/media/nda.<hash>
-// .yaml"` — a bare relative string with no scheme, which throws `TypeError: Invalid URL` when
-// passed to `new URL()` with no base. So under app/'s webpack bundling (dev *and* prod — the
-// custom webpack() in next.config.mjs applies to both), the fallback below is unreachable
-// safely — PLAYBOOK_PATH must be set for @sift/core/agent to work there. The fallback remains
-// correct for non-bundled usage (tests, tsx CLI, MCP server) where import.meta.url resolves
-// normally and no webpack asset-URL rewrite happens.
-const playbookPath =
-  process.env.PLAYBOOK_PATH ??
-  fileURLToPath(new URL("../../../evals/playbook/nda.yaml", import.meta.url));
+/**
+ * Resolve the NDA playbook YAML on disk. Order:
+ *
+ * 1. PLAYBOOK_PATH env — explicit deployer override, always wins.
+ * 2. cwd-relative candidates: `evals/playbook/nda.yaml`, then `../evals/playbook/nda.yaml`.
+ *    This is the branch that works in the deployed Vercel function: the file ships with the
+ *    function via app/next.config.mjs's outputFileTracingIncludes, preserving the repo-relative
+ *    layout under the function root (/var/task). The function's cwd may be the repo root or
+ *    app/ (Vercel Root Directory = app), hence both probes.
+ * 3. import.meta.url-relative fallback — correct ONLY in non-bundled usage (vitest, tsx CLI,
+ *    MCP server). When this module is bundled by Next.js webpack (transpilePackages:
+ *    ["@sift/core"], see app/next.config.mjs), webpack treats `new URL(literal,
+ *    import.meta.url)` as a static-asset import and rewrites it to a *single*-arg
+ *    `new URL("static/media/nda.<hash>.yaml")` call — dropping import.meta.url entirely.
+ *    Verified by inspecting `app/.next/server/chunks/*.js` after `npm -w @sift/app run build`:
+ *    the compiled output is `new c.U(c(98995))` where module 98995 returns
+ *    `c.p + "static/media/nda.<hash>.yaml"` — a bare relative string with no scheme, which
+ *    throws `TypeError: Invalid URL`. In the bundled app this branch is therefore only reached
+ *    when both cwd probes miss, and the throw is caught by the review route's
+ *    dependency-construction guard (clean 500, no crash).
+ *
+ * NOTE a build-time `process.env.PLAYBOOK_PATH` default in next.config.mjs does NOT work on
+ * Vercel and was removed: `.next/required-server-files.json` serializes the resolved config
+ * with `env: {}` (an imperative process.env assignment is a config-load side effect, not
+ * config), and Vercel's launcher instantiates the server from that JSON without re-running
+ * next.config.mjs — so the injected value never reaches the lambda. The cwd probes above are
+ * the deterministic mechanism instead.
+ *
+ * `env`/`cwd` are injectable for tests only; production callers use the defaults. Called
+ * lazily (from buildReviewDeps) rather than at module load so a resolution failure surfaces
+ * where callers can guard it.
+ */
+export function resolvePlaybookPath(
+  env: Record<string, string | undefined> = process.env,
+  cwd: string = process.cwd(),
+): string {
+  if (env.PLAYBOOK_PATH) return env.PLAYBOOK_PATH;
+  for (const candidate of [
+    resolve(cwd, "evals/playbook/nda.yaml"),
+    resolve(cwd, "../evals/playbook/nda.yaml"),
+  ]) {
+    if (existsSync(candidate)) return candidate;
+  }
+  return fileURLToPath(new URL("../../../evals/playbook/nda.yaml", import.meta.url));
+}
 
 /** Looks up a precomputed clause label for a grounded span. Matches db/clauseLabels.ts's getClauseLabel. */
 export type ClauseLabelLookup = (docId: string, charStart: number, charEnd: number) => Promise<ClauseLabel | null>;
@@ -66,7 +97,7 @@ export function buildReviewDeps(
   k = 8,
   lookupClauseLabel: ClauseLabelLookup = defaultLookupClauseLabel,
 ): ReviewDeps {
-  const entries = loadPlaybook(playbookPath);
+  const entries = loadPlaybook(resolvePlaybookPath());
 
   let lastCitation: Citation | null = null;
   const baseRetrieveClause = makeRetrieveClauseTool(io, k);

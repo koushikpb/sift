@@ -25,21 +25,14 @@ try {
   // No root .env (e.g. CI injects env directly) — rely on ambient process.env.
 }
 
-// Default PLAYBOOK_PATH the same way, for the same reason: @sift/core/agent's own
-// import.meta.url-based fallback breaks once webpack bundles it (verified — see the comment on
-// `playbookPath` in core/src/agent/index.ts: webpack rewrites `new URL(literal, import.meta.url)`
-// into a static-asset reference that throws `Invalid URL` at runtime). next.config.mjs runs
-// unbundled, so import.meta.url resolves correctly here; compute the real path once and let
-// @sift/core/agent read it from process.env instead. An explicit PLAYBOOK_PATH (e.g. set in
-// Vercel's dashboard, if the deployed layout differs) still wins — this only fills the gap.
-if (!process.env.PLAYBOOK_PATH) {
-  try {
-    process.env.PLAYBOOK_PATH = fileURLToPath(new URL("../evals/playbook/nda.yaml", import.meta.url));
-  } catch {
-    // Leave unset — @sift/core/agent's own fallback (which will throw once bundled) surfaces
-    // as a clean 500 via the review route's dependency-construction guard, not a crash.
-  }
-}
+// NOTE: do NOT try to default PLAYBOOK_PATH here with a process.env assignment. It works under
+// `next dev`/`next start` but never reaches the deployed Vercel function: the build serializes
+// the *resolved config* into .next/required-server-files.json with `env: {}` (an imperative
+// process.env write at config-load time is a side effect, not config), and Vercel's launcher
+// instantiates the server from that JSON without re-running this file. @sift/core/agent instead
+// resolves the playbook with cwd-relative probes at request time (see resolvePlaybookPath in
+// core/src/agent/index.ts), which works in the function because outputFileTracingIncludes below
+// ships the YAML preserving the repo-relative layout. PLAYBOOK_PATH stays a manual override.
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {

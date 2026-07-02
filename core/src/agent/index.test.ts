@@ -1,5 +1,9 @@
-import { describe, it, expect, vi } from "vitest";
-import { buildReviewDeps } from "./index.js";
+import { describe, it, expect, vi, afterAll } from "vitest";
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { buildReviewDeps, resolvePlaybookPath } from "./index.js";
 import type { RetrieveClauseInput } from "./tools/retrieveClause.js";
 import type { Candidate } from "../retrieve/retrieve.js";
 import type { ClauseLabel } from "../db/clauseLabels.js";
@@ -68,6 +72,40 @@ describe("buildReviewDeps — classify_clause contract enforcement (F1)", () => 
     const result = await deps.classifyClause.run({ text: "anything" });
     expect(result).toEqual({ clause_type: "unclassified", score: 0 });
     expect(lookupClauseLabel).not.toHaveBeenCalled();
+  });
+});
+
+describe("resolvePlaybookPath — layered playbook resolution (F3)", () => {
+  // A fake repo layout: <tmp>/evals/playbook/nda.yaml plus an <tmp>/app subdir, mirroring both
+  // possible Vercel function cwds (function root vs. app/ within it) and local `next dev` (app/).
+  const tmp = mkdtempSync(join(tmpdir(), "sift-playbook-"));
+  const yamlPath = join(tmp, "evals", "playbook", "nda.yaml");
+  mkdirSync(join(tmp, "evals", "playbook"), { recursive: true });
+  mkdirSync(join(tmp, "app"), { recursive: true });
+  writeFileSync(yamlPath, "[]\n");
+  afterAll(() => rmSync(tmp, { recursive: true, force: true }));
+
+  it("PLAYBOOK_PATH env override always wins, even over an existing cwd candidate", () => {
+    expect(resolvePlaybookPath({ PLAYBOOK_PATH: "/explicit/override.yaml" }, tmp)).toBe(
+      "/explicit/override.yaml",
+    );
+  });
+
+  it("resolves evals/playbook/nda.yaml relative to cwd (cwd = repo/function root)", () => {
+    expect(resolvePlaybookPath({}, tmp)).toBe(yamlPath);
+  });
+
+  it("resolves ../evals/playbook/nda.yaml when cwd is one level down (cwd = app/)", () => {
+    expect(resolvePlaybookPath({}, join(tmp, "app"))).toBe(yamlPath);
+  });
+
+  it("falls back to the import.meta.url-relative repo path when no probe matches", () => {
+    // In this (non-bundled) test context the fallback resolves against the real repo layout.
+    // This test file sits in the same directory as index.ts, so the same relative hop applies.
+    const nowhere = join(tmp, "app", "deeper-dir-with-no-evals-above-it");
+    mkdirSync(nowhere, { recursive: true });
+    const result = resolvePlaybookPath({}, nowhere);
+    expect(result).toBe(fileURLToPath(new URL("../../../evals/playbook/nda.yaml", import.meta.url)));
   });
 });
 
