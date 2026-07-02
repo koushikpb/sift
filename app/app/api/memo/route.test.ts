@@ -175,4 +175,58 @@ describe("POST /api/memo — HITL-gated export", () => {
     const res = await POST(req({ ...baseBody, objective: "x".repeat(501) }));
     expect(res.status).toBe(400);
   });
+
+  it("rejects an oversized quote inside a flag's citation span (nested bound, M7-4 fix round)", async () => {
+    const res = await POST(
+      req({
+        ...baseBody,
+        flags: [{ ...baseBody.flags[0], citation: { ...baseBody.flags[0].citation, quote: "x".repeat(20_001) } }],
+      }),
+    );
+    expect(res.status).toBe(400);
+  });
+
+  it("rejects an oversized quote inside a redline's original span (nested bound, M7-4 fix round)", async () => {
+    const res = await POST(
+      req({
+        ...baseBody,
+        redlines: [
+          { ...baseBody.redlines[0], original: { ...baseBody.redlines[0].original, quote: "x".repeat(20_001) } },
+        ],
+      }),
+    );
+    expect(res.status).toBe(400);
+  });
+
+  it("rejects citation offsets above the sanity ceiling and non-integer/negative offsets", async () => {
+    const base = baseBody.flags[0].citation;
+    for (const bad of [
+      { char_start: 10_000_001 }, // above ceiling
+      { char_end: 10_000_001 },
+      { char_start: -1 }, // nonnegative (inherited from core SpanSchema, must survive the extend)
+      { char_start: 1.5 }, // int (inherited)
+    ]) {
+      const res = await POST(
+        req({ ...baseBody, flags: [{ ...baseBody.flags[0], citation: { ...base, ...bad } }] }),
+      );
+      expect(res.status).toBe(400);
+    }
+  });
+
+  it("rejects an oversized playbook_id / clause_type identifier", async () => {
+    const longId = "x".repeat(201);
+    const viaFlag = await POST(req({ ...baseBody, flags: [{ ...baseBody.flags[0], playbook_id: longId }] }));
+    const viaClauseType = await POST(req({ ...baseBody, flags: [{ ...baseBody.flags[0], clause_type: longId }] }));
+    const viaRedline = await POST(
+      req({ ...baseBody, redlines: [{ ...baseBody.redlines[0], playbook_id: longId }] }),
+    );
+    expect(viaFlag.status).toBe(400);
+    expect(viaClauseType.status).toBe(400);
+    expect(viaRedline.status).toBe(400);
+  });
+
+  it("still accepts a null flag citation (missing-required-clause finding) with the bounded span in place", async () => {
+    const res = await POST(req({ ...baseBody, flags: [{ ...baseBody.flags[0], citation: null }] }));
+    expect(res.status).toBe(200);
+  });
 });

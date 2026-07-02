@@ -40,12 +40,32 @@ export interface RateLimitStore {
   increment(key: string, windowMs: number, now: number): { count: number; resetAt: number };
 }
 
-/** Default store: an in-process `Map`. One bucket per key; buckets are never explicitly evicted
- * (they self-overwrite once their window elapses), which is fine at demo scale. */
+/**
+ * Default store: an in-process `Map`, one bucket per key. A key that keeps requesting
+ * self-overwrites its bucket when the window elapses, but a key that goes quiet (IP churn) would
+ * otherwise leave a permanent entry for the instance's life — so once the map reaches
+ * `sweepThreshold` entries, each `increment` first sweeps out every fully-expired bucket
+ * (`now >= resetAt`). The sweep is O(size) but rare: it only runs while at/above the threshold,
+ * and one pass removes everything sweepable. (Degenerate worst case — `sweepThreshold`+ distinct
+ * IPs all inside one live window — re-scans per call until windows expire; at the 5,000 default
+ * that is an acceptable demo-scale cost, and the Upstash backend sidesteps it entirely.)
+ */
 export class MapRateLimitStore implements RateLimitStore {
   private buckets = new Map<string, { count: number; resetAt: number }>();
 
+  constructor(private readonly sweepThreshold = 5_000) {}
+
+  /** Current bucket count — exposed for the eviction test only. */
+  get size(): number {
+    return this.buckets.size;
+  }
+
   increment(key: string, windowMs: number, now: number): { count: number; resetAt: number } {
+    if (this.buckets.size >= this.sweepThreshold) {
+      for (const [k, v] of this.buckets) {
+        if (now >= v.resetAt) this.buckets.delete(k);
+      }
+    }
     const existing = this.buckets.get(key);
     if (!existing || now >= existing.resetAt) {
       const fresh = { count: 1, resetAt: now + windowMs };

@@ -61,6 +61,32 @@ describe("InMemoryRateLimiter", () => {
     expect(blocked.retryAfterSec).toBe(6); // 10s window - 4s elapsed
   });
 
+  it("evicts fully-expired buckets at the sweep threshold — live keys and their counts survive (no leak under IP churn)", async () => {
+    let now = 0;
+    const store = new MapRateLimitStore(5); // low threshold so the test doesn't need 5,000 keys
+    const limiter = new InMemoryRateLimiter({ limit: 3, windowMs: 1_000 }, store, () => now);
+
+    // 4 churn keys at t=0 (windows reset at t=1000)...
+    for (let i = 0; i < 4; i++) await limiter.limit(`stale-${i}`);
+    // ...then a live key at t=500 (window resets at t=1500), twice — count 2. The second call runs
+    // at size === threshold, so a sweep fires but evicts nothing (nothing is expired yet at t=500).
+    now = 500;
+    await limiter.limit("live");
+    await limiter.limit("live");
+    expect(store.size).toBe(5);
+
+    // t=1000: the 4 stale windows are fully expired (now >= resetAt); "live" is not. A call for a
+    // brand-new key sweeps the stale entries before inserting.
+    now = 1_000;
+    await limiter.limit("fresh");
+    expect(store.size).toBe(2); // live + fresh — the 4 stale buckets were evicted, the map shrank
+
+    // The surviving live bucket kept its count: this third hit reaches limit 3 → remaining 0.
+    const third = await limiter.limit("live");
+    expect(third.success).toBe(true);
+    expect(third.remaining).toBe(0);
+  });
+
   it("uses the injected store (not a hidden internal Map) — proves the store is genuinely injectable", async () => {
     let calls = 0;
     const fakeStore: RateLimitStore = {
