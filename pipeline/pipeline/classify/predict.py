@@ -7,8 +7,8 @@ from __future__ import annotations
 import json
 import os
 import sys
+from collections.abc import Callable, Iterable
 from pathlib import Path
-from typing import Callable, Iterable
 
 from pipeline.classify.models import load_label_map
 

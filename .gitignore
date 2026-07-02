@@ -34,4 +34,6 @@ models/**/_checkpoints/
 # Agent-driven-development 
 /.claude
 /.superpowers/
+/.agents
+skills-lock.json
 

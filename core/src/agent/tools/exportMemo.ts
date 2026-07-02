@@ -2,6 +2,13 @@ import { z } from "zod";
 import type { ReviewMemo, ToolDef } from "./types.js";
 import { ReviewMemoSchema } from "./types.js";
 
+// Re-exported so app/app/api/memo/route.ts (Task 7) can validate its POST body against the exact
+// shape renderMemoMarkdown consumes, via the DB-free `@sift/core/agent/memo` entry point below —
+// not `@sift/core/agent` (index.ts), which also imports db/client.ts for buildReviewDeps'
+// clause-label lookups and throws at module-evaluation time when DATABASE_URL isn't visible.
+export { ReviewMemoSchema };
+export type { ReviewMemo };
+
 export interface MemoWriter {
   writeFile: (path: string, contents: string) => Promise<void>;
 }

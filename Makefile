@@ -36,7 +36,7 @@ ingest:
 parse:
 	cd pipeline && .venv/bin/python -m pipeline.cli parse
 
-.PHONY: clf-extract clf-baseline clf-train clf-eval clf-predict
+.PHONY: clf-extract clf-baseline clf-train clf-eval clf-predict clf-precompute
 clf-extract:
 	cd pipeline && .venv/bin/python -m pipeline.classify.extract
 clf-baseline:
@@ -47,6 +47,11 @@ clf-eval:
 	cd pipeline && .venv/bin/python -m pipeline.classify.evaluate
 clf-predict:
 	cd pipeline && .venv/bin/python -m pipeline.classify.predict
+# Precompute LoRA labels for curated demo NDAs and upsert into clause_labels.
+# Curated doc_ids: contractnli_4, contractnli_6, contractnli_1 (public ContractNLI NDAs).
+clf-precompute: migrate
+	$(PY) -m pipeline.classify.precompute_demo \
+	  | (cd core && npx tsx src/db/loadClauseLabels.ts)
 
 .PHONY: eval-derive eval-validate
 eval-derive:

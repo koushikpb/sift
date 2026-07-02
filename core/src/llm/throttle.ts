@@ -42,6 +42,20 @@ export function resolveTimeoutMs(env: NodeJS.ProcessEnv = process.env): number {
 }
 
 /**
+ * Maximum tokens for LLM completions. `LLM_MAX_TOKENS` overrides; `fallback` (default 1024)
+ * is used when the env var is absent or invalid. Required by Anthropic's OpenAI-compatible
+ * endpoint; safe to send to NIM/OpenAI as well.
+ */
+export function resolveMaxTokens(
+  fallback = 1024,
+  env: NodeJS.ProcessEnv = process.env,
+): number {
+  const raw = env.LLM_MAX_TOKENS;
+  const n = raw ? Number(raw) : NaN;
+  return Number.isFinite(n) && n > 0 ? n : fallback;
+}
+
+/**
  * Reserve the next outgoing-request time slot; resolves after waiting if needed.
  * Shared across all callers in the process. `minIntervalMs <= 0` returns immediately
  * WITHOUT advancing the clock, so the no-throttle path is byte-for-byte unchanged.

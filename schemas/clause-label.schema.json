@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/koushikk24/sift/schemas/clause-label.schema.json",
+  "title": "ClauseLabel",
+  "description": "One precomputed clause-label row emitted by pipeline.classify.precompute_demo (Python) and consumed by loadClauseLabels (TypeScript). char_end > char_start cannot be expressed in JSON Schema — enforce it in code.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["doc_id", "char_start", "char_end", "label", "score"],
+  "properties": {
+    "doc_id":      { "type": "string",  "minLength": 1 },
+    "char_start":  { "type": "integer", "minimum": 0 },
+    "char_end":    { "type": "integer", "minimum": 1 },
+    "label":       { "type": "string",  "minLength": 1 },
+    "score":       { "type": "number",  "minimum": 0, "maximum": 1 }
+  }
+}

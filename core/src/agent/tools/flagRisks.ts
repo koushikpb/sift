@@ -3,7 +3,7 @@ import OpenAI from "openai";
 import type { PlaybookEntry } from "../../eval/playbook.js";
 import type { Citation, ReviewFlag, ToolDef } from "./types.js";
 import { matchPlaybookEntry } from "./playbookMatch.js";
-import { reserveSlot, resolveMinIntervalMs, resolveTimeoutMs } from "../../llm/throttle.js";
+import { reserveSlot, resolveMinIntervalMs, resolveTimeoutMs, resolveMaxTokens } from "../../llm/throttle.js";
 
 export interface DeviationJudge {
   judge: (clauseText: string, entry: PlaybookEntry) => Promise<{ deviation: boolean; rationale: string }>;
@@ -87,6 +87,7 @@ export function defaultDeviationJudge(): DeviationJudge {
         const resp = await client.chat.completions.create({
           model,
           temperature: 0,
+          max_tokens: resolveMaxTokens(512),
           messages: [
             { role: "system", content: system },
             { role: "user", content: user },

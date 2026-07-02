@@ -1,7 +1,7 @@
 import { z } from "zod";
 import OpenAI from "openai";
 import type { Citation, ReviewFlag, RedlineProposal, ToolDef } from "./types.js";
-import { reserveSlot, resolveMinIntervalMs, resolveTimeoutMs } from "../../llm/throttle.js";
+import { reserveSlot, resolveMinIntervalMs, resolveTimeoutMs, resolveMaxTokens } from "../../llm/throttle.js";
 
 export interface RedlineWriter {
   suggest: (flag: ReviewFlag, clauseText: string) => Promise<string>;
@@ -62,6 +62,7 @@ export function defaultRedlineWriter(): RedlineWriter {
         const resp = await client.chat.completions.create({
           model,
           temperature: 0,
+          max_tokens: resolveMaxTokens(2048),
           messages: [
             { role: "system", content: "You are a contract-redlining assistant. Reply with ONLY the replacement clause text — no preamble." },
             { role: "user", content: `Rewrite this clause to satisfy the playbook (${flag.rationale}). Original:\n${clauseText}` },
