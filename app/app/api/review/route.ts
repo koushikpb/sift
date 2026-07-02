@@ -1,5 +1,13 @@
 import { z } from "zod";
 import { streamReview, sseEncode } from "@sift/core/serve/review";
+import {
+  getRateLimiter,
+  getRpmLimit,
+  getClientKey,
+  rateLimitedResponse,
+  concurrencySaturatedResponse,
+  createConcurrencyGate,
+} from "../../../src/lib/rateLimit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -9,12 +17,32 @@ export const maxDuration = 60; // Vercel Pro; streaming keeps the connection ali
 // `clause_labels`. reviewContract's classify dep looks these up with no Python subprocess.
 const CURATED_DOC_IDS = ["contractnli_1", "contractnli_4", "contractnli_6"] as const;
 
+const MAX_OBJECTIVE_LEN = 500;
+
 const QuerySchema = z.object({
   docId: z.enum(CURATED_DOC_IDS),
-  objective: z.string().min(1),
+  objective: z.string().min(1).max(MAX_OBJECTIVE_LEN),
 });
 
+// Bounds simultaneous in-flight Anthropic streams (each allowed request costs real LLM money).
+// Module-level singleton: one gate per server instance, matching the concurrency it can actually
+// commit to. See createConcurrencyGate's doc comment in rateLimit.ts for why this stays
+// per-instance rather than distributed.
+const REVIEW_MAX_CONCURRENCY = Number.parseInt(process.env.REVIEW_MAX_CONCURRENCY ?? "", 10) || 2;
+const reviewConcurrency = createConcurrencyGate(REVIEW_MAX_CONCURRENCY);
+
 export async function GET(request: Request): Promise<Response> {
+  // Rate limit runs BEFORE input validation: it protects the (cheap but non-zero) validation work
+  // too, and it means a request with a bad docId still gets a real 429 once the caller is over
+  // budget — hammering with an invalid docId is exactly how this is verified without spending on
+  // the LLM (see task-9-report.md's live verification section).
+  const clientKey = getClientKey(request);
+  const limiter = await getRateLimiter("review", { limit: getRpmLimit(), windowMs: 60_000 });
+  const decision = await limiter.limit(clientKey);
+  if (!decision.success) {
+    return rateLimitedResponse(decision);
+  }
+
   const url = new URL(request.url);
   const parsed = QuerySchema.safeParse({
     docId: url.searchParams.get("docId"),
@@ -24,12 +52,27 @@ export async function GET(request: Request): Promise<Response> {
   if (!parsed.success) {
     return new Response(
       JSON.stringify({
-        error: `Invalid query params: objective (non-empty string) and docId (one of ${CURATED_DOC_IDS.join(", ")}) are required`,
+        error: `Invalid query params: objective (non-empty string, max ${MAX_OBJECTIVE_LEN} chars) and docId (one of ${CURATED_DOC_IDS.join(", ")}) are required`,
       }),
       { status: 400, headers: { "content-type": "application/json" } },
     );
   }
   const { docId, objective } = parsed.data;
+
+  // Concurrency cap: only past this point do we do any real work (dep construction touches the
+  // playbook file + generator; the stream below makes the actual LLM calls), so acquire the slot
+  // here and release it on every exit path from here on (dep-construction failure, stream
+  // done/error, and client disconnect — see the ReadableStream below).
+  if (!reviewConcurrency.tryAcquire()) {
+    return concurrencySaturatedResponse();
+  }
+  let slotReleased = false;
+  const releaseSlot = () => {
+    if (!slotReleased) {
+      slotReleased = true;
+      reviewConcurrency.release();
+    }
+  };
 
   // Dep construction (dynamic imports, makeGenerator, buildReviewDeps's synchronous playbook file
   // read) happens before any stream exists, so it can't be guarded by the ReadableStream's own
@@ -51,6 +94,7 @@ export async function GET(request: Request): Promise<Response> {
       generate: gen.generate.bind(gen),
     });
   } catch (err) {
+    releaseSlot();
     console.error("review route: dependency construction failed:", err);
     return new Response(
       JSON.stringify({ error: "insufficient server configuration" }),
@@ -68,9 +112,19 @@ export async function GET(request: Request): Promise<Response> {
             break;
           }
         }
+      } catch {
+        // Enqueueing after the client has cancelled the stream throws here; the concurrency slot
+        // and controller are still cleaned up below regardless.
       } finally {
+        releaseSlot();
         try { controller.close(); } catch { /* already closed/cancelled */ }
       }
+    },
+    // Client disconnect (tab closed, fetch aborted) invokes cancel(), not necessarily the
+    // start()/finally path above in a timely way — release here too. releaseSlot() is guarded so
+    // whichever path runs first is the one that actually frees the slot.
+    cancel() {
+      releaseSlot();
     },
   });
 

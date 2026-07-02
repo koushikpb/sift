@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { POST } from "./route";
+import { resetRateLimitersForTests } from "../../../src/lib/rateLimit";
 
 function req(body: unknown): Request {
   return new Request("http://localhost/api/memo", {
@@ -35,6 +36,11 @@ const baseBody = {
 describe("POST /api/memo — HITL-gated export", () => {
   afterEach(() => {
     vi.useRealTimers();
+    // Each request in this file shares one client key (no x-forwarded-for header on these test
+    // Requests, so getClientKey falls back to the local-dev constant) and hits the same "memo"
+    // rate-limit bucket. Reset between tests so this suite's request count is decoupled from
+    // RATE_LIMIT_RPM's numeric value.
+    resetRateLimitersForTests();
   });
 
   it("without confirm, returns written:false and a preview only — no memo materializes", async () => {
@@ -121,6 +127,52 @@ describe("POST /api/memo — HITL-gated export", () => {
     const res = await POST(req({ ...baseBody, confirm: "true" }));
     // confirm must be a real boolean per the Zod schema — a string "true" is a validation error,
     // not a silently-coerced confirmation.
+    expect(res.status).toBe(400);
+  });
+
+  it("enforces the per-IP rate limit before body validation: past RATE_LIMIT_RPM -> 429 with Retry-After", async () => {
+    process.env.RATE_LIMIT_RPM = "2";
+    const first = await POST(req(baseBody));
+    const second = await POST(req(baseBody));
+    expect(first.status).toBe(200);
+    expect(second.status).toBe(200);
+
+    const third = await POST(req(baseBody));
+    expect(third.status).toBe(429);
+    expect(third.headers.get("retry-after")).toBeTruthy();
+    const json = await third.json();
+    expect(typeof json.error).toBe("string");
+    delete process.env.RATE_LIMIT_RPM;
+  });
+
+  it("rejects a flags array beyond the max length cap (M7-4)", async () => {
+    const manyFlags = Array.from({ length: 51 }, (_, i) => ({ ...baseBody.flags[0], playbook_id: `p${i}` }));
+    const res = await POST(req({ ...baseBody, flags: manyFlags }));
+    expect(res.status).toBe(400);
+  });
+
+  it("rejects a redlines array beyond the max length cap (M7-4)", async () => {
+    const manyRedlines = Array.from({ length: 51 }, (_, i) => ({ ...baseBody.redlines[0], playbook_id: `p${i}` }));
+    const res = await POST(req({ ...baseBody, redlines: manyRedlines }));
+    expect(res.status).toBe(400);
+  });
+
+  it("rejects an oversized rationale string in a flag (M7-4)", async () => {
+    const res = await POST(
+      req({ ...baseBody, flags: [{ ...baseBody.flags[0], rationale: "x".repeat(2001) }] }),
+    );
+    expect(res.status).toBe(400);
+  });
+
+  it("rejects an oversized suggested_text in a redline (M7-4)", async () => {
+    const res = await POST(
+      req({ ...baseBody, redlines: [{ ...baseBody.redlines[0], suggested_text: "x".repeat(5001) }] }),
+    );
+    expect(res.status).toBe(400);
+  });
+
+  it("rejects an objective over the shared length cap (M7-4)", async () => {
+    const res = await POST(req({ ...baseBody, objective: "x".repeat(501) }));
     expect(res.status).toBe(400);
   });
 });

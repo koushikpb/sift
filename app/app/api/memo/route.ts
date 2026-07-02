@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { ReviewMemoSchema, makeExportMemoTool } from "@sift/core/agent/memo";
+import { getRateLimiter, getRpmLimit, getClientKey, rateLimitedResponse } from "../../../src/lib/rateLimit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -30,8 +31,39 @@ export const dynamic = "force-dynamic";
  * label lookups, unrelated to this route, and throws at module-evaluation time when DATABASE_URL
  * isn't visible. exportMemo.ts has no DB dependency (only zod + the clause-card span schema), so
  * this route never risks that failure mode.
+ *
+ * Length/array caps (Task 9, closes review finding M7-4): `ReviewMemoSchema` itself is the shared
+ * cross-language contract (also consumed by the MCP export_memo tool and CLI evals) and stays
+ * unbounded there; this route tightens it locally via `.max()` on the same field schemas
+ * (`ReviewMemoSchema.shape.*`, reused rather than redeclared so citation/enum/strict-object
+ * validation is untouched) to whatever the UI can actually produce. The curated demo playbook
+ * (evals/playbook/nda.yaml) has 7 positions, so one review run yields at most 7 flags/redlines in
+ * practice — the caps below give generous headroom above that while still bounding a hostile
+ * client's payload size.
  */
+const MAX_OBJECTIVE_LEN = 500; // matches the review route's objective cap (same field, echoed back)
+const MAX_DOC_ID_LEN = 100;
+const MAX_ARRAY_LEN = 50; // real usage tops out at 7 (one per playbook position)
+const MAX_RATIONALE_LEN = 2000;
+const MAX_SUGGESTED_TEXT_LEN = 5000; // a proposed redline can be a full clause rewrite
+
+const FlagElement = ReviewMemoSchema.shape.flags.element;
+const RedlineElement = ReviewMemoSchema.shape.redlines.element;
+
 const MemoRequestSchema = ReviewMemoSchema.omit({ fields: true, generated_at: true }).extend({
+  doc_id: ReviewMemoSchema.shape.doc_id.max(MAX_DOC_ID_LEN),
+  objective: ReviewMemoSchema.shape.objective.max(MAX_OBJECTIVE_LEN),
+  flags: FlagElement.extend({
+    rationale: FlagElement.shape.rationale.max(MAX_RATIONALE_LEN),
+  })
+    .array()
+    .max(MAX_ARRAY_LEN),
+  redlines: RedlineElement.extend({
+    suggested_text: RedlineElement.shape.suggested_text.max(MAX_SUGGESTED_TEXT_LEN),
+    rationale: RedlineElement.shape.rationale.max(MAX_RATIONALE_LEN),
+  })
+    .array()
+    .max(MAX_ARRAY_LEN),
   confirm: z.boolean().optional(),
 });
 
@@ -41,6 +73,15 @@ const exportMemoTool = makeExportMemoTool({
 });
 
 export async function POST(request: Request): Promise<Response> {
+  // Rate limit runs BEFORE reading/validating the body — protects the (cheap) parse/validate work
+  // too, matching the review route's ordering.
+  const clientKey = getClientKey(request);
+  const limiter = await getRateLimiter("memo", { limit: getRpmLimit(), windowMs: 60_000 });
+  const decision = await limiter.limit(clientKey);
+  if (!decision.success) {
+    return rateLimitedResponse(decision);
+  }
+
   let body: unknown;
   try {
     body = await request.json();
