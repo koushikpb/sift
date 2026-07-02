@@ -159,16 +159,34 @@ describe("POST /api/memo — HITL-gated export", () => {
 
   it("rejects an oversized rationale string in a flag (M7-4)", async () => {
     const res = await POST(
-      req({ ...baseBody, flags: [{ ...baseBody.flags[0], rationale: "x".repeat(2001) }] }),
+      req({ ...baseBody, flags: [{ ...baseBody.flags[0], rationale: "x".repeat(8_001) }] }),
     );
     expect(res.status).toBe(400);
   });
 
+  it("accepts a rationale within the demo's plausible LLM output range but below the cap (F3)", async () => {
+    // ~4k chars is the plausible ceiling at the demo profile's LLM_MAX_TOKENS=1024 (see route.ts's
+    // doc comment) — this must NOT 400, unlike the old MAX_RATIONALE_LEN=2000 cap.
+    const res = await POST(
+      req({ ...baseBody, flags: [{ ...baseBody.flags[0], rationale: "x".repeat(4_000) }] }),
+    );
+    expect(res.status).toBe(200);
+  });
+
   it("rejects an oversized suggested_text in a redline (M7-4)", async () => {
     const res = await POST(
-      req({ ...baseBody, redlines: [{ ...baseBody.redlines[0], suggested_text: "x".repeat(5001) }] }),
+      req({ ...baseBody, redlines: [{ ...baseBody.redlines[0], suggested_text: "x".repeat(20_001) }] }),
     );
     expect(res.status).toBe(400);
+  });
+
+  it("accepts a suggested_text within the demo's plausible LLM output range but below the cap (F3)", async () => {
+    // ~8k chars is the plausible ceiling for a redline (see route.ts's doc comment) — this must NOT
+    // 400, unlike the old MAX_SUGGESTED_TEXT_LEN=5000 cap.
+    const res = await POST(
+      req({ ...baseBody, redlines: [{ ...baseBody.redlines[0], suggested_text: "x".repeat(8_000) }] }),
+    );
+    expect(res.status).toBe(200);
   });
 
   it("rejects an objective over the shared length cap (M7-4)", async () => {

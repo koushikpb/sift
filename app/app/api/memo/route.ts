@@ -44,13 +44,25 @@ export const dynamic = "force-dynamic";
  * playbook (evals/playbook/nda.yaml) has 7 positions, so one review run yields at most 7
  * flags/redlines in practice — the caps below give generous headroom above that while still
  * bounding a hostile client's payload size.
+ *
+ * MAX_RATIONALE_LEN / MAX_SUGGESTED_TEXT_LEN are sized off the LLM's actual token budget, not an
+ * arbitrary UI guess (final-review-fix-report.md F3): flagRisks/draftRedline (core/src/agent/
+ * tools/) request a per-callsite max_tokens (512 / 2048), but `resolveMaxTokens`
+ * (core/src/llm/throttle.ts) lets `LLM_MAX_TOKENS` override that — and the documented demo profile
+ * (.env.demo.example) sets `LLM_MAX_TOKENS=1024` for every callsite. At a rough ~4 chars/token,
+ * that's a ~4,000-char plausible ceiling per field — but token:char ratio varies by content and a
+ * deploy can raise `LLM_MAX_TOKENS` further, so each cap below carries roughly a 2x safety factor
+ * over that plausible max rather than rejecting genuine model output at the boundary.
+ * `suggested_text` gets extra headroom (a redline can restate a full clause plus surrounding
+ * framing) matching `MAX_QUOTE_LEN`'s existing generosity for the same "worst case is an entire
+ * clause" reasoning.
  */
 const MAX_OBJECTIVE_LEN = 500; // matches the review route's objective cap (same field, echoed back)
 const MAX_DOC_ID_LEN = 100;
 const MAX_ID_LEN = 200; // playbook_id / clause_type identifiers
 const MAX_ARRAY_LEN = 50; // real usage tops out at 7 (one per playbook position)
-const MAX_RATIONALE_LEN = 2000;
-const MAX_SUGGESTED_TEXT_LEN = 5000; // a proposed redline can be a full clause rewrite
+const MAX_RATIONALE_LEN = 8_000; // ~2x the ~4k-char plausible max at the demo's 1024-token budget
+const MAX_SUGGESTED_TEXT_LEN = 20_000; // full clause rewrite; matches MAX_QUOTE_LEN's generosity
 const MAX_QUOTE_LEN = 20_000; // a citation quote is one clause span — generous but finite
 const MAX_CHAR_OFFSET = 10_000_000; // largest corpus doc is well under 1M chars; hard sanity ceiling
 

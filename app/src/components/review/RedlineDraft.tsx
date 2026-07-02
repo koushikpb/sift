@@ -14,9 +14,10 @@ export interface RedlineDraftProps {
 
 /**
  * A single playbook-grounded redline proposal: the suggested replacement text and the rationale
- * for it. Extracted from ClauseCard (Task 7) so ExportMemoDialog's preview can render each of a
- * doc's redlines with the same visual language as the inline per-clause panel — same markup, same
- * component, one definition of "what a redline looks like."
+ * for it. Extracted out of ClauseCard (Task 7) as its own component so a flag's redline renders
+ * with one definition of "what a redline looks like," reused wherever ClauseCard shows it. Note:
+ * ExportMemoDialog does NOT render via this component — its preview is the server-rendered
+ * markdown memo (a `<pre>` block); it only imports the `RedlineProposal` type from this file.
  */
 export function RedlineDraft({ redline }: RedlineDraftProps) {
   return (
