@@ -1,5 +1,12 @@
 name: security
 on: [push, pull_request]
+# Least privilege: contents:read for checkout; pull-requests:write because
+# gitleaks-action@v2 comments on PRs by default (its README documents GITHUB_TOKEN is
+# used to call the create-review-comment API; disable via GITLEAKS_ENABLE_COMMENTS=false
+# and this can drop to contents:read only).
+permissions:
+  contents: read
+  pull-requests: write
 jobs:
   gitleaks:
     runs-on: ubuntu-latest

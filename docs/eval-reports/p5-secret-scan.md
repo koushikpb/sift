@@ -63,26 +63,36 @@ gitleaks' own docs — they don't replace the defaults):
    `.env.example` / `.env.demo.example` at any depth. Verified against both filenames plus
    negative cases (`foo.example.ts`, `notexample.md`) with a standalone regex test — matches only
    the intended files.
-2. **The one docs false-positive above** — path-scoped to
-   `docs/superpowers/specs/2026-06-25-phase-1-naive-baseline-design.md` exactly, with a comment
-   explaining the manual audit and why path-based (not content-regex) allowlisting was chosen.
+2. **The one docs false-positive above** — scoped with `condition = "AND"` to BOTH the exact
+   file path (`docs/superpowers/specs/2026-06-25-phase-1-naive-baseline-design.md`) AND the
+   single historical commit that introduced the prose (`c3e33874…`, the only commit ever
+   touching that file per `git log --follow` / `git log -S`). Without the commit pin, a
+   path-only allowlist would exempt the entire file from all rules permanently; with it, a
+   secret pasted into that doc in any future commit is still detected — proven by negative
+   test: a fake AWS key appended to that exact file on a throwaway commit **was caught**
+   (`aws-access-token`, exit code 1) with this allowlist active. The commit + reasoning are
+   in a config comment; the flagged (non-secret) substring is deliberately never echoed.
 
 **Re-run after adding config:**
 ```
 gitleaks detect --redact -v
 ```
 ```
-130 commits scanned, ~2.52 MB
+131 commits scanned, ~2.53 MB
 no leaks found
 ```
 Confirmed clean, and confirmed the allowlist suppressed *exactly* the one finding from Step 1
-(1 → 0), nothing more.
+(1 → 0), nothing more. (Commit counts throughout this report are point-in-time snapshots — the
+count grows with the branch; the initial scan predated this task's own commit, later scans
+include it.)
 
 ## Step 3 — CI (`.github/workflows/security.yml`)
 First workflow in the repo (no prior `.github/workflows/`). Matches the brief's job exactly
 (`gitleaks/gitleaks-action@v2`, `actions/checkout@v4` with `fetch-depth: 0` for full history), plus
 the standard `GITHUB_TOKEN` env line the action needs on personal (non-org) repos — no license key
-required at this scale. Runs on every `push` and `pull_request`.
+required at this scale. Runs on every `push` and `pull_request`. A least-privilege `permissions:`
+block is set: `contents: read` (checkout) + `pull-requests: write` (the action's README documents
+it uses `GITHUB_TOKEN` to post PR review comments, on by default via `GITLEAKS_ENABLE_COMMENTS`).
 
 ## Step 4 — Detection proof (throwaway branch)
 Branch `throwaway/gitleaks-detection-proof`, one commit adding a single scratch file with a
@@ -120,17 +130,23 @@ proof demonstrates the CI gate will actually block a PR carrying a real-shaped l
 - Final `git status`: clean except this task's new/untracked files
   (`.gitleaks.toml`, `.github/`, plus pre-existing unrelated untracked `.agents/`,
   `skills-lock.json`).
-- Final re-run of `gitleaks detect --redact -v` on `phase-5-demo-hosting`: **130 commits scanned,
-  no leaks found.**
+- Final re-run of `gitleaks detect --redact -v` on `phase-5-demo-hosting`: **131 commits scanned,
+  no leaks found** (point-in-time count; includes this task's own commit).
+- The allowlist-scoping negative test (Step 2) used a second throwaway branch
+  (`throwaway/allowlist-scope-negative-test`), cleaned up the same way: branch deleted, reflog
+  expired, `git gc --prune=now`, fake-key commit object confirmed pruned, no trace in
+  `git log --all`.
 
 ## Decisions
 - **Pre-commit hook: skipped**, per the task brief marking it optional. CI (`security.yml`) is the
   enforced gate; a local hook would add a gitleaks-binary dependency for every contributor's
   machine without adding real coverage beyond what CI already blocks on `push`/`pull_request`.
-- **Docs false-positive: allowlisted by file path, not by echoing the matched text.** Keeps the
-  `.gitleaks.toml` from ever containing a copy of the flagged (non-secret) substring, and keeps the
-  determination auditable (path + commit + line + reasoning, all in this report) without needing to
-  bypass `--redact`.
+- **Docs false-positive: allowlisted by path AND pinned to its introducing commit, never by
+  echoing the matched text.** Keeps the `.gitleaks.toml` from ever containing a copy of the
+  flagged (non-secret) substring, keeps the determination auditable (path + commit + line +
+  reasoning, all in this report) without needing to bypass `--redact`, and — because of the
+  `condition = "AND"` commit pin — leaves the file fully scanned in every future commit
+  (negative-tested, see Step 2).
 
 ## Re-running this check
 ```
