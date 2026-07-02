@@ -4,6 +4,7 @@ import type { ClauseCard } from "../schemas/clauseCard.js";
 import { loadPlaybook } from "../eval/playbook.js";
 import { withClient } from "../db/client.js";
 import { getClauseLabel } from "../db/clauseLabels.js";
+import type { ClauseLabel } from "../db/clauseLabels.js";
 import { reviewContract } from "./reviewAgent.js";
 import type { ReviewDeps, ReviewResult } from "./reviewAgent.js";
 import { makeRetrieveClauseTool } from "./tools/retrieveClause.js";
@@ -17,7 +18,28 @@ import type { Citation, ClauseClassification, ToolDef } from "./tools/types.js";
 export { reviewContract };
 export type { ReviewDeps, ReviewResult };
 
-const playbookPath = fileURLToPath(new URL("../../../evals/playbook/nda.yaml", import.meta.url));
+// PLAYBOOK_PATH lets a deployer override playbook resolution outright (checked first). This is
+// not just a defensive fallback for app/: when this module is bundled by Next.js webpack
+// (transpilePackages: ["@sift/core"], see app/next.config.mjs), webpack treats
+// `new URL(literal, import.meta.url)` as a static-asset import and rewrites it to a *single*-arg
+// `new URL("static/media/nda.<hash>.yaml")` call — dropping import.meta.url entirely. Verified by
+// inspecting `app/.next/server/chunks/*.js` after `npm -w @sift/app run build`: the compiled
+// output is `new c.U(c(98995))` where module 98995 just returns `c.p + "static/media/nda.<hash>
+// .yaml"` — a bare relative string with no scheme, which throws `TypeError: Invalid URL` when
+// passed to `new URL()` with no base. So under app/'s webpack bundling (dev *and* prod — the
+// custom webpack() in next.config.mjs applies to both), the fallback below is unreachable
+// safely — PLAYBOOK_PATH must be set for @sift/core/agent to work there. The fallback remains
+// correct for non-bundled usage (tests, tsx CLI, MCP server) where import.meta.url resolves
+// normally and no webpack asset-URL rewrite happens.
+const playbookPath =
+  process.env.PLAYBOOK_PATH ??
+  fileURLToPath(new URL("../../../evals/playbook/nda.yaml", import.meta.url));
+
+/** Looks up a precomputed clause label for a grounded span. Matches db/clauseLabels.ts's getClauseLabel. */
+export type ClauseLabelLookup = (docId: string, charStart: number, charEnd: number) => Promise<ClauseLabel | null>;
+
+const defaultLookupClauseLabel: ClauseLabelLookup = (docId, charStart, charEnd) =>
+  withClient((client) => getClauseLabel(client, docId, charStart, charEnd));
 
 /**
  * Assemble a real ReviewDeps for the hosted demo (Task 5's /api/review). Mirrors
@@ -33,8 +55,17 @@ const playbookPath = fileURLToPath(new URL("../../../evals/playbook/nda.yaml", i
  * export_memo's writer throws if ever invoked: reviewContract never sets confirm:true, so normal
  * operation never reaches it. Throwing (rather than silently writing or no-op'ing) makes the HITL
  * gate a hard backstop at the dependency boundary, not just a convention callers must uphold.
+ *
+ * `lookupClauseLabel` defaults to the real DB-backed lookup but is injectable so callers (tests)
+ * can exercise the classify wiring — including the ordering-invariant check below — without a
+ * live Postgres.
  */
-export function buildReviewDeps(docId: string, io: RetrieveClauseDeps, k = 8): ReviewDeps {
+export function buildReviewDeps(
+  docId: string,
+  io: RetrieveClauseDeps,
+  k = 8,
+  lookupClauseLabel: ClauseLabelLookup = defaultLookupClauseLabel,
+): ReviewDeps {
   const entries = loadPlaybook(playbookPath);
 
   let lastCitation: Citation | null = null;
@@ -55,10 +86,23 @@ export function buildReviewDeps(docId: string, io: RetrieveClauseDeps, k = 8): R
       "Look up the precomputed LoRA clause-type label for the most recently retrieved citation (Task 4 clause_labels table). No Python subprocess.",
     sideEffect: "read",
     inputShape: { text: z.string().min(1) },
-    async run(): Promise<ClauseClassification> {
+    // input.text is declared but reviewAgent's fixed ClassifyInput = {text} can't carry the
+    // span this lookup needs (see module doc above) — lastCitation supplies it instead. That
+    // makes the {text} contract only a promise if the caller's ordering invariant holds
+    // (classify_clause always follows the retrieve_clause it's about to classify). Enforce it
+    // here rather than trusting it silently: if input.text doesn't match the captured span's
+    // quote, something violated the ordering (or a future caller changed it) — refuse to
+    // classify the wrong clause and throw loudly instead of returning a plausible-looking but
+    // wrong label. streamReview's try/catch turns this into a clean `error` SSE event.
+    async run(input: ClassifyInput): Promise<ClauseClassification> {
       if (!lastCitation) return { clause_type: "unclassified", score: 0 };
+      if (input.text !== lastCitation.quote) {
+        throw new Error(
+          "classify_clause: input.text does not match the most recently retrieved citation — refusing to classify the wrong span (ordering invariant violated)",
+        );
+      }
       const { char_start, char_end } = lastCitation;
-      const row = await withClient((client) => getClauseLabel(client, docId, char_start, char_end));
+      const row = await lookupClauseLabel(docId, char_start, char_end);
       return row ? { clause_type: row.label, score: row.score } : { clause_type: "unclassified", score: 0 };
     },
   };

@@ -31,17 +31,32 @@ export async function GET(request: Request): Promise<Response> {
   }
   const { docId, objective } = parsed.data;
 
-  const [{ makeRetriever }, { makeGenerator }, { buildReviewDeps }] = await Promise.all([
-    import("@sift/core/retrieve"),
-    import("@sift/core/generate"),
-    import("@sift/core/agent"),
-  ]);
+  // Dep construction (dynamic imports, makeGenerator, buildReviewDeps's synchronous playbook file
+  // read) happens before any stream exists, so it can't be guarded by the ReadableStream's own
+  // try/catch below. A missing/bad env (e.g. DATABASE_URL, LLM_PROVIDER) or an unreadable playbook
+  // file must not surface as an unhandled rejection or a stack trace to the client — report a
+  // generic 500 instead. This block is scoped to this route only; the success-path streaming
+  // control flow below is unchanged.
+  let deps;
+  try {
+    const [{ makeRetriever }, { makeGenerator }, { buildReviewDeps }] = await Promise.all([
+      import("@sift/core/retrieve"),
+      import("@sift/core/generate"),
+      import("@sift/core/agent"),
+    ]);
 
-  const gen = makeGenerator();
-  const deps = buildReviewDeps(docId, {
-    retrieve: makeRetriever(process.env.RETRIEVE_MODE),
-    generate: gen.generate.bind(gen),
-  });
+    const gen = makeGenerator();
+    deps = buildReviewDeps(docId, {
+      retrieve: makeRetriever(process.env.RETRIEVE_MODE),
+      generate: gen.generate.bind(gen),
+    });
+  } catch (err) {
+    console.error("review route: dependency construction failed:", err);
+    return new Response(
+      JSON.stringify({ error: "insufficient server configuration" }),
+      { status: 500, headers: { "content-type": "application/json" } },
+    );
+  }
 
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
