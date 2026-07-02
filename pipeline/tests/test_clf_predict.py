@@ -1,6 +1,6 @@
 import json
 
-from pipeline.classify.predict import parse_input_line, format_prediction, run_predict
+from pipeline.classify.predict import format_prediction, parse_input_line, run_predict
 
 
 def test_parse_input_line_reads_text_field_and_skips_blank():
