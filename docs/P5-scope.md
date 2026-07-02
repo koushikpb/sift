@@ -112,3 +112,19 @@ Stack = Next.js (TS) + Postgres/pgvector + a **Python LoRA subprocess** + outbou
 ## Non-goals (unchanged from SPEC)
 Not legal advice. Not multi-contract enterprise. Not a chat-over-PDF wrapper. P5 adds no new legal
 capability — it packages and hardens what exists.
+
+---
+
+## Curated demo docs
+
+The Task-4 precompute pipeline (`make clf-precompute`) runs against exactly three public
+ContractNLI NDAs selected for size variety and clean node structure:
+
+| doc_id | approx. chars | clause rows |
+|---|---|---|
+| `contractnli_4` | 2 405 | 9 |
+| `contractnli_6` | 8 715 | 20 |
+| `contractnli_1` | 16 632 | 13 |
+
+These are the **demo/review allowlist** for the Task-5 API.  All are licensed for NLP research
+(ContractNLI public corpus). Total: 42 precomputed label rows in `clause_labels`.

@@ -6,6 +6,10 @@ tested without loading the LoRA model — a stub classifier is injected.
 
 import json
 
+import pytest
+from pydantic import ValidationError
+
+from pipeline.artifacts import ClauseLabel
 from pipeline.classify.precompute_demo import collect_clause_spans, precompute_rows
 
 # ---------------------------------------------------------------------------
@@ -131,3 +135,41 @@ def test_precompute_rows_preserves_span_identity():
 
 def test_precompute_rows_empty_input():
     assert precompute_rows([], _stub_classify) == []
+
+
+# ---------------------------------------------------------------------------
+# ClauseLabel pydantic validation (mirrors schemas/clause-label.schema.json)
+# ---------------------------------------------------------------------------
+
+
+def test_clause_label_rejects_score_above_one():
+    """score > 1.0 must raise ValidationError."""
+    with pytest.raises(ValidationError):
+        ClauseLabel(doc_id="d1", char_start=0, char_end=10, label="Confidentiality", score=1.5)
+
+
+def test_clause_label_rejects_score_below_zero():
+    """score < 0.0 must raise ValidationError."""
+    with pytest.raises(ValidationError):
+        ClauseLabel(doc_id="d1", char_start=0, char_end=10, label="Confidentiality", score=-0.1)
+
+
+def test_clause_label_rejects_char_end_equal_to_char_start():
+    """char_end == char_start must raise ValidationError (zero-length span)."""
+    with pytest.raises(ValidationError):
+        ClauseLabel(doc_id="d1", char_start=10, char_end=10, label="Governing Law", score=0.9)
+
+
+def test_clause_label_rejects_char_end_less_than_char_start():
+    """char_end < char_start must raise ValidationError (inverted span)."""
+    with pytest.raises(ValidationError):
+        ClauseLabel(doc_id="d1", char_start=20, char_end=5, label="Governing Law", score=0.9)
+
+
+def test_clause_label_valid_row_is_accepted():
+    """A fully valid row passes without error."""
+    row = ClauseLabel(
+        doc_id="contractnli_4", char_start=18, char_end=40, label="Confidentiality", score=0.97
+    )
+    assert row.doc_id == "contractnli_4"
+    assert row.score == 0.97

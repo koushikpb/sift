@@ -1,15 +1,17 @@
 /**
- * Unit tests for core/src/db/clauseLabels.ts.
+ * Unit tests for core/src/db/clauseLabels.ts and clauseLabelRow.ts.
  *
  * A minimal mock PoolClient is injected so no live Postgres is required.
  * The tests verify:
  *   - getClauseLabel returns the stored {label,score} for a known span
  *   - getClauseLabel returns null for an absent span
  *   - upsertClauseLabel issues the correct parameterised query
+ *   - ClauseLabelRowSchema rejects invalid rows (mirrors schemas/clause-label.schema.json)
  */
 import { describe, it, expect, vi } from "vitest";
 import type { PoolClient } from "pg";
 import { getClauseLabel, upsertClauseLabel } from "../src/db/clauseLabels.js";
+import { ClauseLabelRowSchema } from "../src/db/clauseLabelRow.js";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -65,5 +67,55 @@ describe("upsertClauseLabel", () => {
     expect(sql).toMatch(/INSERT/i);
     expect(sql).toMatch(/ON CONFLICT/i);
     expect(params).toEqual(["contractnli_6", 55, 120, "Termination", 0.91]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// ClauseLabelRowSchema — mirrors schemas/clause-label.schema.json
+// ---------------------------------------------------------------------------
+
+const validRow = {
+  doc_id: "contractnli_4",
+  char_start: 18,
+  char_end: 40,
+  label: "Confidentiality",
+  score: 0.97,
+};
+
+describe("ClauseLabelRowSchema", () => {
+  it("accepts a valid row", () => {
+    expect(() => ClauseLabelRowSchema.parse(validRow)).not.toThrow();
+  });
+
+  it("rejects score > 1", () => {
+    expect(() => ClauseLabelRowSchema.parse({ ...validRow, score: 1.5 })).toThrow();
+  });
+
+  it("rejects score < 0", () => {
+    expect(() => ClauseLabelRowSchema.parse({ ...validRow, score: -0.1 })).toThrow();
+  });
+
+  it("rejects char_end equal to char_start", () => {
+    expect(() =>
+      ClauseLabelRowSchema.parse({ ...validRow, char_start: 18, char_end: 18 }),
+    ).toThrow();
+  });
+
+  it("rejects char_end less than char_start", () => {
+    expect(() =>
+      ClauseLabelRowSchema.parse({ ...validRow, char_start: 40, char_end: 10 }),
+    ).toThrow();
+  });
+
+  it("rejects empty doc_id", () => {
+    expect(() => ClauseLabelRowSchema.parse({ ...validRow, doc_id: "" })).toThrow();
+  });
+
+  it("rejects empty label", () => {
+    expect(() => ClauseLabelRowSchema.parse({ ...validRow, label: "" })).toThrow();
+  });
+
+  it("rejects extra properties (strict)", () => {
+    expect(() => ClauseLabelRowSchema.parse({ ...validRow, extra: "oops" })).toThrow();
   });
 });

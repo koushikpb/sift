@@ -21,6 +21,8 @@ import sys
 from collections.abc import Callable
 from pathlib import Path
 
+from pipeline.artifacts import ClauseLabel
+
 # Node types used as clause spans for classification.
 CLAUSE_NODE_TYPES: frozenset[str] = frozenset({"section", "subsection", "definition"})
 
@@ -86,15 +88,14 @@ def precompute_rows(
     predictions = classify(texts)
     rows = []
     for span, (label, score) in zip(spans, predictions):
-        rows.append(
-            {
-                "doc_id": span["doc_id"],
-                "char_start": span["char_start"],
-                "char_end": span["char_end"],
-                "label": label,
-                "score": float(score),
-            }
+        row = ClauseLabel(
+            doc_id=span["doc_id"],
+            char_start=span["char_start"],
+            char_end=span["char_end"],
+            label=label,
+            score=float(score),
         )
+        rows.append(row.model_dump())
     return rows
 
 

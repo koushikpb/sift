@@ -6,27 +6,18 @@
  *   python -m pipeline.classify.precompute_demo | tsx src/db/loadClauseLabels.ts
  */
 import * as readline from "node:readline";
-import { z } from "zod";
+// mirrors schemas/clause-label.schema.json
+import { ClauseLabelRowSchema } from "./clauseLabelRow.js";
 import { withClient, pool } from "./client.js";
 import { upsertClauseLabel } from "./clauseLabels.js";
 
-const RowSchema = z
-  .object({
-    doc_id: z.string().min(1),
-    char_start: z.number().int(),
-    char_end: z.number().int(),
-    label: z.string().min(1),
-    score: z.number(),
-  })
-  .strict();
-
 const rl = readline.createInterface({ input: process.stdin, crlfDelay: Infinity });
-const rows: z.infer<typeof RowSchema>[] = [];
+const rows: Awaited<ReturnType<typeof ClauseLabelRowSchema.parseAsync>>[] = [];
 
 for await (const line of rl) {
   const trimmed = line.trim();
   if (!trimmed) continue;
-  rows.push(RowSchema.parse(JSON.parse(trimmed)));
+  rows.push(ClauseLabelRowSchema.parse(JSON.parse(trimmed)));
 }
 
 await withClient(async (client) => {
