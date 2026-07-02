@@ -12,7 +12,8 @@
     "./generate": "./src/generate/index.ts",
     "./serve": "./src/serve/answerStream.ts",
     "./serve/review": "./src/serve/reviewStream.ts",
-    "./agent": "./src/agent/index.ts"
+    "./agent": "./src/agent/index.ts",
+    "./agent/memo": "./src/agent/tools/exportMemo.ts"
   },
   "scripts": {
     "test": "vitest run",

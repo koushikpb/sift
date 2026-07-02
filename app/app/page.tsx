@@ -5,6 +5,7 @@ import type { ReviewEvent } from "@sift/core/serve/review";
 import { cn } from "../src/lib/cn";
 import { ClauseCard } from "../src/components/review/ClauseCard";
 import { DocPicker } from "../src/components/review/DocPicker";
+import { ExportMemoDialog } from "../src/components/review/ExportMemoDialog";
 
 type ClauseEvent = Extract<ReviewEvent, { type: "clause" }>;
 type StatusEvent = Extract<ReviewEvent, { type: "status" }>;
@@ -19,6 +20,7 @@ type ErrorEvent = Extract<ReviewEvent, { type: "error" }>;
 export default function Page() {
   const [docId, setDocId] = useState("");
   const [objective, setObjective] = useState("");
+  const [submittedDocId, setSubmittedDocId] = useState("");
   const [submittedObjective, setSubmittedObjective] = useState("");
   const [statusMessages, setStatusMessages] = useState<string[]>([]);
   const [clauses, setClauses] = useState<ClauseEvent[]>([]);
@@ -41,6 +43,7 @@ export default function Page() {
     }
     reset();
     setRunning(true);
+    setSubmittedDocId(docId);
     setSubmittedObjective(trimmedObjective);
 
     const params = new URLSearchParams({ objective: trimmedObjective, docId });
@@ -132,6 +135,20 @@ export default function Page() {
               refusal_reason={event.refusal_reason}
             />
           ))}
+        </div>
+      )}
+
+      {/* Once the stream finishes (not mid-stream, to avoid per-card churn on the export
+          affordance itself), offer to export a memo built from everything the client has:
+          the flags and redlines carried by this run's clause events. */}
+      {!running && clauses.length > 0 && (
+        <div className="mt-8 flex justify-end">
+          <ExportMemoDialog
+            docId={submittedDocId}
+            objective={submittedObjective}
+            flags={clauses.map((c) => c.flag).filter((f): f is NonNullable<ClauseEvent["flag"]> => f !== null)}
+            redlines={clauses.map((c) => c.redline).filter((r): r is NonNullable<ClauseEvent["redline"]> => r !== null)}
+          />
         </div>
       )}
     </main>

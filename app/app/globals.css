@@ -23,3 +23,20 @@
   --color-warning: var(--warning);
   --color-success: var(--success);
 }
+
+/* Dialog enter/exit motion (ExportMemoDialog — Task 7), keyed off Radix's data-state attribute.
+   Referenced via Tailwind arbitrary values (animate-[dialog-in_200ms_ease-out]) and always gated
+   behind motion-safe: — Tailwind v4 has no built-in fade/scale keyframes, so these are minimal,
+   purpose-scoped additions rather than a new animation-library dependency. */
+@keyframes fade-in {
+  from { opacity: 0; }
+}
+@keyframes fade-out {
+  to { opacity: 0; }
+}
+@keyframes dialog-in {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(0.96); }
+}
+@keyframes dialog-out {
+  to { opacity: 0; transform: translate(-50%, -50%) scale(0.96); }
+}

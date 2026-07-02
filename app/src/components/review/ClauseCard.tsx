@@ -3,6 +3,10 @@ import type { Span } from "./CitationHighlight";
 import { SeverityBadge } from "./SeverityBadge";
 import type { Severity } from "./SeverityBadge";
 import { RefusalNotice } from "./RefusalNotice";
+import { RedlineDraft } from "./RedlineDraft";
+import type { RedlineProposal } from "./RedlineDraft";
+
+export type { RedlineProposal };
 
 export interface ClauseClassification {
   clause_type: string;
@@ -16,13 +20,6 @@ export interface ReviewFlag {
   deviation: boolean;
   rationale: string;
   citation: Span | null;
-}
-
-export interface RedlineProposal {
-  playbook_id: string;
-  original: Span;
-  suggested_text: string;
-  rationale: string;
 }
 
 export interface ClauseCardProps {
@@ -97,13 +94,7 @@ export function ClauseCard({
 
           {flag && <p className="text-sm text-muted">{flag.rationale}</p>}
 
-          {redline && (
-            <div className="rounded-lg border border-accent/20 bg-accent/5 p-4">
-              <p className="mb-2 text-xs font-medium uppercase tracking-wide text-accent">Suggested redline</p>
-              <p className="text-sm leading-relaxed text-foreground/90">{redline.suggested_text}</p>
-              <p className="mt-2 text-xs text-muted">{redline.rationale}</p>
-            </div>
-          )}
+          {redline && <RedlineDraft redline={redline} />}
         </div>
       )}
     </article>
