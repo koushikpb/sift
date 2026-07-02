@@ -10,7 +10,9 @@
     "./retrieve": "./src/retrieve/retrieve.ts",
     "./schemas": "./src/schemas/clauseCard.ts",
     "./generate": "./src/generate/index.ts",
-    "./serve": "./src/serve/answerStream.ts"
+    "./serve": "./src/serve/answerStream.ts",
+    "./serve/review": "./src/serve/reviewStream.ts",
+    "./agent": "./src/agent/index.ts"
   },
   "scripts": {
     "test": "vitest run",
