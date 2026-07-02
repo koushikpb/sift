@@ -18,11 +18,14 @@
     "migrate": "tsx src/db/migrate.ts",
     "load": "tsx src/load/cli.ts",
     "embed": "tsx src/embed/cli.ts",
-    "eval": "tsx src/eval/cli.ts"
+    "eval": "tsx src/eval/cli.ts",
+    "mcp": "tsx src/mcp/server.ts",
+    "agent-eval": "tsx src/agent/cli.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.27.0",
     "@huggingface/transformers": "^3.0.0",
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "dotenv": "^16.4.5",
     "openai": "^4.67.0",
     "pg": "^8.11.5",

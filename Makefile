@@ -36,7 +36,7 @@ ingest:
 parse:
 	cd pipeline && .venv/bin/python -m pipeline.cli parse
 
-.PHONY: clf-extract clf-baseline clf-train clf-eval
+.PHONY: clf-extract clf-baseline clf-train clf-eval clf-predict
 clf-extract:
 	cd pipeline && .venv/bin/python -m pipeline.classify.extract
 clf-baseline:
@@ -45,12 +45,20 @@ clf-train:
 	cd pipeline && .venv/bin/python -m pipeline.classify.train
 clf-eval:
 	cd pipeline && .venv/bin/python -m pipeline.classify.evaluate
+clf-predict:
+	cd pipeline && .venv/bin/python -m pipeline.classify.predict
 
 .PHONY: eval-derive eval-validate
 eval-derive:
 	cd core && npm run eval -- derive
 eval-validate:
 	cd core && npm run eval -- validate
+
+.PHONY: mcp-serve agent-eval
+mcp-serve:
+	cd core && npm run mcp
+agent-eval:
+	cd core && npm run agent-eval
 
 .PHONY: verify-p0
 verify-p0: db-up migrate

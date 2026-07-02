@@ -2,6 +2,45 @@
 
 Architectural decisions, kept current as they are made. Newest first.
 
+## 2026-07-01 — Phase 4: Action agent + MCP (SPEC Layer 3)
+- **ADOPT the action agent.** P4's acceptance is "report agent evals + hold the hard invariants +
+  write a failure-mode taxonomy" (no pre-registered task-success threshold). Both hard invariants
+  hold: **citation groundedness 1.0** (no hallucinated spans) and **0 unconfirmed writes** (the HITL
+  gate held across all 50 items). On the 39 items that completed without a NIM transport failure:
+  task success **0.846**, **flag coverage 19/19 (false-negative rate 0)**, refusal correctness
+  **2/2**. The 6 real (non-transport) failures are all span-localization retrieval misses (Layer-1
+  ceiling), not action-layer defects. Full report: `docs/eval-reports/P4.md`.
+- **Agent = deterministic tool trajectory, not an LLM free-choice loop.** `reviewContract` composes
+  retrieve→check_playbook→classify→flag→redline→memo in a fixed order so the trajectory is
+  reproducible and the gate is stable. An LLM-driven MCP client can still drive the same tools live
+  (the demo); the gate uses the deterministic path.
+- **HITL gate lives in the tool, proven by absence of writes.** `export_memo` is the only write tool
+  and no-ops (returns a preview) unless `confirm===true`. The eval never confirms, so
+  `unconfirmed_writes===0` is positive proof the guardrail holds.
+- **classify_clause bridges the P3 LoRA over a JSON-Schema'd Python CLI** (`schemas/clf-prediction.
+  schema.json`), consistent with the repo's "modules meet at validated JSON" rule.
+- **Flag selection keys off the OBJECTIVE, not the CUAD classifier label (the C1 fix).** The eval's
+  flag_match objectives are ContractNLI-style; CUAD's 37 labels map to only ~2 playbook positions,
+  so a classify-keyed design scored ~1/25. Resolving the position from the objective (explicit
+  `(playbook requires X)` tag for missing items; a curated ContractNLI-hypothesis→position map for
+  deviated items) + a "missing required clause" flag (grounded in absence, `citation:null`) restored
+  flag coverage to 19/19. This is understanding the review *request*, not reading the answer — the
+  deviation/absence verdict still comes from the judge/retrieval.
+- **Bounded LLM timeout + retry on all NIM clients** (`LLM_TIMEOUT_MS`, default 45s; `maxRetries:1`).
+  Without it the OpenAI SDK waits ~10 min on a stalled NIM connection and hangs eval runs; a finite
+  timeout lets a stall fail fast so the per-item degrade path continues.
+- **Gate model substitution: `llama-3.1-70b-instruct`.** At gate time `llama-3.3-70b-instruct`
+  returned 0 bytes/25–30s repeatedly, so the gate ran on the comparable 70B `llama-3.1` (~7s). P4's
+  gate tests the action agent, not a specific model, so a working comparable 70B is a fair
+  substitution. **Post-gate follow-up corrected the root cause:** `llama-3.3-70b` was not down but
+  **capacity-queued** on the shared free tier — probing with a long timeout, a one-token prompt
+  returned HTTP 200 (`"ok"`) with time-to-first-byte == total == ~114s (pure queue wait, not
+  inference; `stream`/`max_tokens` got 0 bytes for the whole window), variable 100–150s+, while
+  `/models` stayed 200/0.13s and `llama-3.1-70b` answered in ~7s on the same key. Matches NVIDIA's
+  documented free tier (40 RPM, no SLA; requests queue/"hang" under load). A clean re-run off-peak,
+  or staying on `llama-3.1-70b`, tightens the headline numbers; the `0-bytes-then-timeout` symptom is
+  a capacity signal, not an outage. Full evidence: `docs/eval-reports/P4.md` § NIM capacity queueing.
+
 ## 2026-06-30 — Phase 3: Prompt → RAG → Fine-tune decision (Layer 2 clause classifier)
 - **Decision: ADOPT the LoRA-fine-tuned clause classifier over the prompted baseline.** The
   before/after was run on an *identical* 371-item stratified CUAD test subset (37 classes),

@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ClfPrediction",
+  "description": "One clause-classifier prediction emitted by pipeline.classify.predict (Python) and consumed by the classify_clause tool (TypeScript).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["text", "label", "score"],
+  "properties": {
+    "text": { "type": "string" },
+    "label": { "type": "string" },
+    "score": { "type": "number" }
+  }
+}
