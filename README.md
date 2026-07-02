@@ -133,7 +133,7 @@ Validated, not assumed — details in `docs/eval-reports/p5-secret-scan.md` and
 - **Secret scanning:** `gitleaks` over the full git history comes back clean; a detection proof
   confirms it actually catches a real-shaped credential; enforced on every push/PR via
   `.github/workflows/security.yml`.
-- **Rate limiting:** per-IP requests/minute on `/api/review`, `/api/memo`, `/api/answer`
+- **Rate limiting:** per-IP requests/minute on `/api/review`, `/api/memo`
   (`app/src/lib/rateLimit.ts`), plus a concurrency cap on simultaneous in-flight LLM streams —
   bounds both abuse and LLM spend. Upstash Redis backing is used when configured (durable across
   serverless instances); otherwise an in-process fallback.
@@ -212,7 +212,7 @@ The generator is provider-agnostic behind an OpenAI-compatible client. Configure
 
 - `pipeline/` — Python 3.11: dataset ingestion, structure-aware parser, LoRA fine-tuning.
 - `core/` — TypeScript/Node 20: pgvector schema, retrieval, agent, MCP server, eval tooling.
-- `app/` — Next.js demo (SSE streaming review UI, `/api/review`, `/api/memo`, `/api/answer`).
+- `app/` — Next.js demo (SSE streaming review UI, `/api/review`, `/api/memo`).
 - `schemas/` — JSON Schema source of truth for every cross-language artifact (pydantic + Zod both
   validate against these).
 - `docs/eval-reports/` — the eval gate reports cited above; `DECISIONS.md` — architectural

@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { fileURLToPath } from "node:url";
 import { streamReview } from "./reviewStream.js";
 import type { ReviewEvent } from "./reviewStream.js";
@@ -116,5 +116,42 @@ describe("streamReview", () => {
 
     expect(writes).toHaveLength(0);
     expect(events.filter(isClause).length).toBeGreaterThan(0);
+  });
+
+  it("a system failure (tool throws) yields a generic error message to the stream, logs the real one server-side (F1)", async () => {
+    const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const sensitiveMessage = "connect ECONNREFUSED postgres://sift:s3cr3t@db.internal:5432/sift";
+
+    const { deps: baseDeps } = makeDeps({ refuse: false, deviation: true });
+    const deps: ReviewDeps = {
+      ...baseDeps,
+      // Stand in for a system failure deep in the trajectory (DB error, SDK error echoing the LLM
+      // base URL/model, an invariant throw) — none of it should reach the client verbatim.
+      retrieveClause: makeRetrieveClauseTool({
+        retrieve: async () => {
+          throw new Error(sensitiveMessage);
+        },
+        generate: async () => ({ answer: "", supporting: [], refused: false, refusal_reason: null }),
+      }),
+    };
+
+    const events = await collect(streamReview(objectiveConfidentialityTerm, "d1", deps, { generatedAt }));
+
+    const errorEvents = events.filter((e): e is Extract<ReviewEvent, { type: "error" }> => e.type === "error");
+    expect(errorEvents).toHaveLength(1);
+    expect(errorEvents[0].message).toBe("review failed — try again");
+    expect(errorEvents[0].message).not.toContain("postgres://");
+    expect(errorEvents[0].message).not.toContain("s3cr3t");
+
+    // The full stream still terminates with `done`, same as every other path.
+    expect(events[events.length - 1]).toEqual({ type: "done" });
+
+    // The real error is still observable server-side, just not sent to the client.
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      expect.stringContaining("streamReview"),
+      expect.objectContaining({ message: sensitiveMessage }),
+    );
+
+    consoleErrorSpy.mockRestore();
   });
 });

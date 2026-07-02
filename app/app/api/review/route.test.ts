@@ -71,7 +71,7 @@ describe("GET /api/review — rate limit ordering + concurrency cap", () => {
     expect(res.status).toBe(400);
   });
 
-  it("saturates the concurrency cap (503) while a stream is in flight, and releases the slot on client cancel — not just on done", async () => {
+  it("saturates the concurrency cap (503) while a stream is in flight, and keeps the slot held through client cancel until the underlying run actually finishes — releasing exactly once", async () => {
     process.env.REVIEW_MAX_CONCURRENCY = "1";
     process.env.RATE_LIMIT_RPM = "10";
     const { GET } = await import("./route");
@@ -87,11 +87,23 @@ describe("GET /api/review — rate limit ordering + concurrency cap", () => {
     expect(second.status).toBe(503);
     expect(second.headers.get("retry-after")).toBeTruthy();
 
-    // Simulate a client disconnect (tab closed / fetch aborted) instead of letting the stream
-    // reach "done" — this must free the slot via the ReadableStream's cancel() callback.
+    // Simulate a client disconnect (tab closed / fetch aborted). This invokes the ReadableStream's
+    // cancel() callback, but must NOT free the slot: the mocked generator standing in for
+    // reviewContract is still parked (the real LLM pipeline would still be running) — a
+    // connect-and-cancel loop must not be able to bypass the concurrency cap.
     await reader.cancel();
 
     const third = await GET(req({ docId: "contractnli_1", objective: "third" }));
-    expect(third.status).toBe(200);
+    expect(third.status).toBe(503);
+
+    // Only once the underlying run actually completes (here: `hold()` resolves the parked promise,
+    // standing in for the 45s LLM timeout + retry finally settling) does start()'s finally release
+    // the slot — exactly once, even though enqueueing the trailing "done" event onto the
+    // already-cancelled controller throws and is caught.
+    hold?.();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    const fourth = await GET(req({ docId: "contractnli_1", objective: "fourth" }));
+    expect(fourth.status).toBe(200);
   });
 });

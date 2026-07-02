@@ -109,8 +109,11 @@ export async function* streamReview(
       yield event;
     }
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : String(err);
-    yield { type: "error", message };
+    // The raw error can carry internals a browser must never see (pg connection strings, SDK
+    // errors echoing the LLM base URL/model, invariant messages) — log it server-side only and
+    // stream a generic message to the client.
+    console.error("streamReview: reviewContract failed:", err);
+    yield { type: "error", message: "review failed — try again" };
   }
 
   yield { type: "done" };

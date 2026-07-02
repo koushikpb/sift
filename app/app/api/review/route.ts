@@ -61,8 +61,10 @@ export async function GET(request: Request): Promise<Response> {
 
   // Concurrency cap: only past this point do we do any real work (dep construction touches the
   // playbook file + generator; the stream below makes the actual LLM calls), so acquire the slot
-  // here and release it on every exit path from here on (dep-construction failure, stream
-  // done/error, and client disconnect — see the ReadableStream below).
+  // here and release it on every exit path from here on (dep-construction failure, or the stream's
+  // start() reaching done/error — see the ReadableStream below). Client disconnect (cancel()) does
+  // NOT release the slot early: the underlying LLM run keeps going regardless of whether anyone is
+  // still reading the stream, so the slot stays held until that run actually finishes.
   if (!reviewConcurrency.tryAcquire()) {
     return concurrencySaturatedResponse();
   }
@@ -120,12 +122,13 @@ export async function GET(request: Request): Promise<Response> {
         try { controller.close(); } catch { /* already closed/cancelled */ }
       }
     },
-    // Client disconnect (tab closed, fetch aborted) invokes cancel(), not necessarily the
-    // start()/finally path above in a timely way — release here too. releaseSlot() is guarded so
-    // whichever path runs first is the one that actually frees the slot.
-    cancel() {
-      releaseSlot();
-    },
+    // Client disconnect (tab closed, fetch aborted) invokes cancel() — deliberately NOT wired to
+    // releaseSlot(). Cancelling the reader doesn't abort the in-flight reviewContract call; the
+    // for-await loop in start() keeps running the real LLM pipeline regardless. Releasing the slot
+    // here would let a connect-and-cancel loop hold unbounded concurrent LLM pipelines despite the
+    // cap. The slot is freed exactly once, in start()'s finally below, once the generator actually
+    // finishes — bounded by the existing 45s per-call LLM timeout + retry, not by client behavior.
+    cancel() {},
   });
 
   return new Response(stream, {
