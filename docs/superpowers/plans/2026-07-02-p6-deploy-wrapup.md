@@ -10,6 +10,7 @@
 
 ## Global Constraints
 
+- **Anthropic budget (user, 2026-07-02): ~$6 total remains and is reserved for demo usage.** Validation may spend at most **~$0.30 total** (Task 1 local smoke + Task 4 public smoke). No other Anthropic calls; never retry a failed live call more than once; `LLM_MAX_TOKENS=1024` stays. Task 6 (gate re-run) is **DEFERRED** — do not run it on any paid provider.
 - **Secrets never printed, pasted in chat, or committed.** Keys live in the local gitignored `.env` and the Vercel dashboard only. When echoing env for evidence, redact values (`sed -E 's/(KEY|URL|TOKEN)=.+/\1=<set>/'`).
 - **Demo inference profile** (from `.env.demo.example`): `LLM_BASE_URL=https://api.anthropic.com/v1/`, `LLM_MODEL=claude-sonnet-4-6`, `LLM_MAX_TOKENS=1024`, `RETRIEVE_MODE=hybrid`.
 - **Curated allowlist** served by the API: `contractnli_1`, `contractnli_4`, `contractnli_6`; `clause_labels` must hold exactly 42 rows for them (13/9/20).
@@ -176,6 +177,10 @@ git commit -m "docs: live demo link + retrieve-mode qualifier + diagram fix"
 ---
 
 ### Task 6: P5.0 gate re-run on Claude (needs Task 1 only; local infra)
+
+> **DEFERRED (user decision, 2026-07-02):** remaining Anthropic credit (~$6) is reserved for demo
+> usage; the user chose to defer the gate rather than run it on free NIM. It stays in the backlog
+> (`docs/P6-scope.md` §3) until credits are topped up or NIM stabilizes. Do not execute this task.
 
 **Files:**
 - Create: `evals/reports/p6_agent_claude.json`, `docs/eval-reports/P6-gate.md`
