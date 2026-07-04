@@ -48,6 +48,9 @@ moves here.
   dev-only npm-audit residual chain).
 - Accepted-minor backlog: see `.superpowers/sdd/final-review-minors.md` triage table in the P5
   final review (all ACCEPTed items remain valid small cleanups).
+- (P6 final review) `makeRetriever` still silently falls through to embedder-dependent dense on
+  unknown `RETRIEVE_MODE` values — the trap that cost a deploy iteration. Add a `console.warn`
+  on unrecognized non-empty modes (keep the dense default; no eval'd behavior change).
 
 ## Non-goals (unchanged)
 Not legal advice. Not multi-contract enterprise. No new ML capability in P6 — deploy + prove.

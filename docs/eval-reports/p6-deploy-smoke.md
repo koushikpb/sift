@@ -53,6 +53,10 @@ no internals leaked) then `429 ×5` — flip exactly at the 10-requests/min fixe
 - same body + `confirm: true` → 200 `{written: true, markdown: …}`
 - invalid body (`{"doc_id":123}`) → 400 `{"error":"invalid memo request"}` ✅
 
+### 6. Browser pass
+Deferred to the demo-GIF recording session post-merge (`docs/demo-script.md` is the beat-by-beat
+script for it); the API-level checks above covered the full server surface.
+
 ## Notes / follow-ups
 - **Retrieve-mode qualifier (Task 5):** hosted demo runs lexical FTS, not the eval-winning
   hybrid — the bge-large query embedder cannot run in a Vercel function (read-only FS +

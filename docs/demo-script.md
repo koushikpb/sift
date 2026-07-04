@@ -81,8 +81,9 @@ behavior, not a dropped frame — no need to reshoot if they all appear together
 **6. The clause card (~6s)**
 One card renders. Point at, top to bottom:
 - Header: "Reviewing: **confidential information**" plus a severity badge at top-right — either
-  green **"Meets playbook standard"** or an amber/red **"`<Severity>` severity · deviation"**
-  (the specific outcome is a live LLM judgment call it either way).
+  green **"Meets playbook standard"** or amber **"Medium severity · deviation"** (this
+  objective's playbook position is fixed `medium`; only the deviation verdict is a live LLM
+  judgment call).
 - The classification pill just below (LoRA clause-type label · confidence %) — precomputed from
   the `clause_labels` table, exact label/score varies by run.
 - The cited quote in the left-bordered blockquote — **hover over the highlighted (`<mark>`)
