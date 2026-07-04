@@ -1,14 +1,18 @@
 import { Pool, type PoolClient } from "pg";
 import * as dotenv from "dotenv";
 import { fileURLToPath } from "node:url";
+import { dirname, resolve } from "node:path";
 
 // Load the repo-root .env for standalone (CLI / tsx) usage. When this module is
-// bundled by a framework (e.g. Next.js webpack), `import.meta.url` is rewritten and
-// the host has already populated process.env — so only attempt the file load when
-// DATABASE_URL is absent, and never let a bundled context throw on path resolution.
+// bundled by a framework (e.g. Next.js webpack), the host has already populated
+// process.env — so only attempt the file load when DATABASE_URL is absent, and never
+// let a bundled context throw on path resolution. Must NOT use the
+// `new URL("<literal>", import.meta.url)` form: webpack resolves that literal as a
+// build-time asset, and .env is gitignored — absent from CI/deploy clones, failing
+// the build ("Module not found: Can't resolve '../../../.env'").
 if (!process.env.DATABASE_URL) {
   try {
-    dotenv.config({ path: fileURLToPath(new URL("../../../.env", import.meta.url)) });
+    dotenv.config({ path: resolve(dirname(fileURLToPath(import.meta.url)), "../../../.env") });
   } catch {
     dotenv.config();
   }

@@ -7,8 +7,8 @@ grounding every claim in a cited source span and **refusing when it can't ground
 Not legal advice — a human decides. Built and evaluated on public data only (CUAD, ContractNLI).
 NDA is the wedge, not the ceiling: see `SPEC.md` for the full plan.
 
-**Demo:** coming soon
-<!-- TODO(deploy): demo URL -->
+**Demo:** [sift-koushikpb1.vercel.app](https://sift-koushikpb1.vercel.app) — first request after
+idle may take a few extra seconds (free-tier DB cold start).
 
 <!-- TODO(deploy): demo GIF/walkthrough — human-recorded, see Task 11/12 notes -->
 
@@ -18,7 +18,8 @@ NDA is the wedge, not the ceiling: see `SPEC.md` for the full plan.
 
 Given an NDA and a review objective, sift:
 1. **Retrieves** the relevant clause via hybrid dense + lexical search over a structure-aware
-   parse of the contract, reranked and looped through an agentic sufficiency check.
+   parse of the contract, reranked and looped through an agentic sufficiency check (the hosted
+   demo runs lexical-only retrieval — see **Architecture** below).
 2. **Classifies** the clause type with a LoRA-fine-tuned Legal-BERT model.
 3. **Flags** deviations against an NDA playbook (or a missing-required-clause finding, grounded
    in absence).
@@ -54,7 +55,7 @@ flowchart TB
 
     subgraph L3["L3 — Action agent + MCP"]
         direction TB
-        tools["retrieve / classify / flag /\nredline / memo (6 tools)"]
+        tools["retrieve / extract_fields / classify /\nflag / redline / memo (6 tools)"]
         mcp["MCP server (stdio)"]
         hitl{{"HITL confirm gate\n(export_memo)"}}
         tools --> mcp
@@ -76,7 +77,12 @@ flowchart TB
 - **L1 — Agentic RAG.** Structure-aware parsing (articles → sections → clauses), hybrid dense +
   lexical retrieval fused with RRF, cross-encoder reranking, and an agentic retrieve →
   evaluate-sufficiency → retrieve-again loop with an explicit refusal path. Every candidate
-  carries the `{ doc_id, char_start, char_end, quote }` citation invariant above.
+  carries the `{ doc_id, char_start, char_end, quote }` citation invariant above. For the hosted
+  demo, retrieval runs `RETRIEVE_MODE=lexical` (Postgres full-text search) — the bge-large query
+  embedder can't run inside a Vercel function (read-only filesystem blocks caching the model, and
+  a cold-start download would blow the 60s budget). Hybrid (dense + lexical + rerank) remains the
+  local default and the eval winner, and the agentic sufficiency loop is likewise a local-only
+  mode.
 - **L2 — LoRA clause classifier.** Legal-BERT fine-tuned with LoRA to classify clause type,
   adopted over a prompted 70B baseline after a pre-registered before/after gate (numbers below).
   For the hosted demo, labels for the curated NDAs are **precomputed** into `clause_labels` so
