@@ -34,6 +34,12 @@ try {
 // core/src/agent/index.ts), which works in the function because outputFileTracingIncludes below
 // ships the YAML preserving the repo-relative layout. PLAYBOOK_PATH stays a manual override.
 
+// DEPLOY NOTE: the hosted demo runs RETRIEVE_MODE=lexical (Postgres full-text search).
+// vector/hybrid modes need the bge-large query embedder, and @huggingface/transformers
+// cannot fetch/cache the model inside a Vercel function: the filesystem is read-only
+// (mkdir node_modules/@huggingface/transformers/.cache → ENOENT) and a cold-start model
+// download would blow the 60s function budget anyway. Verified live 2026-07-04.
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   transpilePackages: ["@sift/core"],
