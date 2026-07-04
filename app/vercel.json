@@ -1,4 +1,5 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "functions": {
     "app/api/review/route.ts": { "maxDuration": 60 },
     "app/api/memo/route.ts": { "maxDuration": 60 }
