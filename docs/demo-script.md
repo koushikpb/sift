@@ -6,8 +6,8 @@ copied verbatim from the app's source (`app/app/page.tsx` and
 `app/src/components/review/*.tsx`) — if the live UI ever shows different text, trust the UI and
 treat this script as stale.
 
-**URL:** https://sift-koushikpb1.vercel.app (production; goes live once `phase-6-deploy-wrapup`
-merges — that's the point at which this GIF gets recorded).
+**URL:** https://sift-app-iota.vercel.app (production — the project's stable Vercel domain;
+per-deployment `sift-<hash>-…` URLs go stale on every deploy, don't record against those).
 
 ## Why this script deviates from the original brief
 

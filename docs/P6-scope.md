@@ -51,6 +51,10 @@ moves here.
 - (P6 final review) `makeRetriever` still silently falls through to embedder-dependent dense on
   unknown `RETRIEVE_MODE` values — the trap that cost a deploy iteration. Add a `console.warn`
   on unrecognized non-empty modes (keep the dense default; no eval'd behavior change).
+- (post-deploy) Connection-level SSE failures are invisible in the UI: `app/app/page.tsx`'s
+  `es.onerror` only resets `running` — a non-200 `/api/review` response (e.g. the 500 from a
+  stale deployment missing env vars) renders nothing, so the page looks like it "did nothing".
+  Surface a generic error card from `onerror` when no events arrived.
 
 ## Non-goals (unchanged)
 Not legal advice. Not multi-contract enterprise. No new ML capability in P6 — deploy + prove.

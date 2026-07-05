@@ -7,7 +7,7 @@ grounding every claim in a cited source span and **refusing when it can't ground
 Not legal advice — a human decides. Built and evaluated on public data only (CUAD, ContractNLI).
 NDA is the wedge, not the ceiling: see `SPEC.md` for the full plan.
 
-**Demo:** [sift-koushikpb1.vercel.app](https://sift-koushikpb1.vercel.app) — first request after
+**Demo:** [sift-app-iota.vercel.app](https://sift-app-iota.vercel.app) — first request after
 idle may take a few extra seconds (free-tier DB cold start).
 
 <!-- TODO(deploy): demo GIF/walkthrough — human-recorded, see Task 11/12 notes -->
