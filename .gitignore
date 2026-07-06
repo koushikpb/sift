@@ -31,9 +31,3 @@ evals/data/candidates.jsonl
 # ML training checkpoints (the final adapter under models/ is committed; these are transient)
 models/**/_checkpoints/
 
-# Agent-driven-development 
-/.claude
-/.superpowers/
-/.agents
-skills-lock.json
-
