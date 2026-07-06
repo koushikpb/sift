@@ -13,7 +13,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 60; // Vercel Pro; streaming keeps the connection alive
 
-// Curated demo corpus (Task 4): the only doc_ids with precomputed classify labels in
+// Curated demo corpus: the only doc_ids with precomputed classify labels in
 // `clause_labels`. reviewContract's classify dep looks these up with no Python subprocess.
 const CURATED_DOC_IDS = ["contractnli_1", "contractnli_4", "contractnli_6"] as const;
 
@@ -34,8 +34,8 @@ const reviewConcurrency = createConcurrencyGate(REVIEW_MAX_CONCURRENCY);
 export async function GET(request: Request): Promise<Response> {
   // Rate limit runs BEFORE input validation: it protects the (cheap but non-zero) validation work
   // too, and it means a request with a bad docId still gets a real 429 once the caller is over
-  // budget — hammering with an invalid docId is exactly how this is verified without spending on
-  // the LLM (see task-9-report.md's live verification section).
+  // budget — hammering with an invalid docId is exactly how this was smoke-verified live,
+  // without spending on the LLM.
   const clientKey = getClientKey(request);
   const limiter = await getRateLimiter("review", { limit: getRpmLimit(), windowMs: 60_000 });
   const decision = await limiter.limit(clientKey);

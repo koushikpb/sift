@@ -6,7 +6,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * export_memo mapped to the Vercel-safe demo (Task 7). This is the same HITL gate `reviewContract`
+ * export_memo mapped to the Vercel-safe demo. This is the same HITL gate `reviewContract`
  * uses internally (see core/src/agent/index.ts's buildReviewDeps, whose exportMemo throws on any
  * real write attempt): without `confirm:true` the tool returns a rendered-markdown PREVIEW only
  * (`written:false`); nothing downstream can happen with it. The only difference here is that
@@ -32,7 +32,7 @@ export const dynamic = "force-dynamic";
  * isn't visible. exportMemo.ts has no DB dependency (only zod + the clause-card span schema), so
  * this route never risks that failure mode.
  *
- * Length/array caps (Task 9, closes review finding M7-4): `ReviewMemoSchema` itself is the shared
+ * Length/array caps: `ReviewMemoSchema` itself is the shared
  * cross-language contract (also consumed by the MCP export_memo tool and CLI evals) and stays
  * unbounded there; this route tightens it locally via `.max()` on the same field schemas
  * (`ReviewMemoSchema.shape.*`, reused rather than redeclared so enum/strict-object validation is

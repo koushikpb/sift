@@ -2,19 +2,19 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 /**
- * Web hardening (Task 9): security headers on every response — pages and API routes alike (the
+ * Web hardening: security headers on every response — pages and API routes alike (the
  * matcher below excludes only Next's own static asset paths). Runs before any route handler, so
  * headers land on error responses too.
  *
- * CSP is pragmatic, not maximal — the brief's explicit constraint is "must not break Next.js
+ * CSP is pragmatic, not maximal — the operative constraint is "must not break Next.js
  * hydration/inline runtime or the EventSource flow":
  * - `script-src 'self' 'unsafe-inline'`: Next 15's App Router streams React 19 hydration data via
  *   inline `<script>` tags injected during SSR (`self.__next_f.push(...)`), and next/font emits an
  *   inline `<style>` block for @font-face rules (see `style-src` below). Locking these down
  *   properly needs a per-request nonce threaded from this middleware through the root layout
  *   (reading a header via `next/headers`) into every such tag Next generates itself — real, but
- *   out of scope for this task's file list (middleware.ts + routes only; no layout.tsx change was
- *   planned or reviewed). `'unsafe-inline'` is the documented, common trade-off Next.js's own CSP
+ *   out of scope here (middleware.ts + routes only; no layout.tsx involvement).
+ *   `'unsafe-inline'` is the documented, common trade-off Next.js's own CSP
  *   guide falls back to without nonce wiring. `'unsafe-eval'` is deliberately NOT included in
  *   production; it's added only in development, where Next's HMR/fast-refresh client depends on
  *   `eval()`-based source maps (dev-only, matches `next dev`, which is what live verification
@@ -28,8 +28,8 @@ import type { NextRequest } from "next/server";
  *   never meant to be framed.
  * - No `Access-Control-Allow-Origin` header is set anywhere in this app (middleware or routes):
  *   the API is same-origin only, browsers already refuse cross-origin reads of these responses by
- *   default, and no `OPTIONS` preflight handler exists on any route. That absence (verified in
- *   task-9-report.md's live `curl -I` evidence) is the "lock CORS to the app origin" requirement —
+ *   default, and no `OPTIONS` preflight handler exists on any route. That absence (verified live
+ *   via `curl -I` against the running app) is the "lock CORS to the app origin" requirement —
  *   there is nothing permissive to lock down.
  */
 function buildCsp(): string {

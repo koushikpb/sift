@@ -1,5 +1,5 @@
 /**
- * Per-IP rate limiting + a global concurrency gate, shared by every LLM/API route (Task 9).
+ * Per-IP rate limiting + a global concurrency gate, shared by every LLM/API route.
  *
  * Two independent primitives:
  * - `RateLimiter` (`InMemoryRateLimiter` / `getRateLimiter`): a sliding-window-ish fixed-window
@@ -126,7 +126,7 @@ const inMemoryStores = new Map<string, MapRateLimitStore>();
  * requests this minute and a freshly-spun-up sibling instance both allow their own 10), so the
  * *effective* ceiling scales with concurrent instance count rather than being a hard global cap.
  * That's an accepted limitation for this demo (documented here + in `.env.demo.example`) — real
- * Upstash creds close the gap and are wired up at deploy time (Task 11). Locally (`next dev`,
+ * Upstash creds close the gap and are wired up at deploy time. Locally (`next dev`,
  * single process) the in-memory limiter is exact.
  */
 export async function getRateLimiter(routeName: string, opts: RateLimitOptions): Promise<RateLimiter> {

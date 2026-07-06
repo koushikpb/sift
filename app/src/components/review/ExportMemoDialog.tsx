@@ -56,7 +56,7 @@ function downloadMarkdown(docId: string, markdown: string): void {
 }
 
 /**
- * The HITL gate for exporting a review memo, made visible in the UI (Task 7). Opening this dialog
+ * The HITL gate for exporting a review memo, made visible in the UI. Opening this dialog
  * fetches a PREVIEW only (`POST /api/memo` without `confirm` — see route.ts's honest gate: it
  * returns `{written:false, preview}` and never touches disk). The "Confirm & download" button is
  * the ONLY code path in this component that sends `confirm:true`; its response is the only thing

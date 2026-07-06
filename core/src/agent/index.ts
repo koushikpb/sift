@@ -73,9 +73,9 @@ const defaultLookupClauseLabel: ClauseLabelLookup = (docId, charStart, charEnd) 
   withClient((client) => getClauseLabel(client, docId, charStart, charEnd));
 
 /**
- * Assemble a real ReviewDeps for the hosted demo (Task 5's /api/review). Mirrors
+ * Assemble a real ReviewDeps for the hosted demo (/api/review). Mirrors
  * mcp/tools.ts's buildTools, but the classify dep reads the precomputed clause_labels table
- * (Task 4) instead of spawning Python — required for Vercel serverless (no Python runtime).
+ * instead of spawning Python — required for Vercel serverless (no Python runtime).
  *
  * classify_clause's ToolDef input is `{text}` only (no span — see tools/classifyClause.ts), so
  * the precomputed lookup needs the citation span from another source: we capture it from the
@@ -114,7 +114,7 @@ export function buildReviewDeps(
     name: "classify_clause",
     title: "Classify a clause (precomputed LoRA label)",
     description:
-      "Look up the precomputed LoRA clause-type label for the most recently retrieved citation (Task 4 clause_labels table). No Python subprocess.",
+      "Look up the precomputed LoRA clause-type label for the most recently retrieved citation (clause_labels table). No Python subprocess.",
     sideEffect: "read",
     inputShape: { text: z.string().min(1) },
     // input.text is declared but reviewAgent's fixed ClassifyInput = {text} can't carry the

@@ -58,7 +58,7 @@ Deferred to the demo-GIF recording session post-merge (`docs/demo-script.md` is 
 script for it); the API-level checks above covered the full server surface.
 
 ## Notes / follow-ups
-- **Retrieve-mode qualifier (Task 5):** hosted demo runs lexical FTS, not the eval-winning
+- **Retrieve-mode qualifier:** hosted demo runs lexical FTS, not the eval-winning
   hybrid — the bge-large query embedder cannot run in a Vercel function (read-only FS +
   cold-start download > 60s budget). Local runs keep `RETRIEVE_MODE=hybrid`. README must
   say so.

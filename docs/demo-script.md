@@ -9,7 +9,7 @@ treat this script as stale.
 **URL:** https://sift-app-iota.vercel.app (production — the project's stable Vercel domain;
 per-deployment `sift-<hash>-…` URLs go stale on every deploy, don't record against those).
 
-## Why this script deviates from the original brief
+## Why these exact objectives
 
 - **Objective text is "confidential information", not "confidentiality term".** The hosted demo
   runs `RETRIEVE_MODE=lexical` (Postgres full-text search; `websearch_to_tsquery` ANDs every word

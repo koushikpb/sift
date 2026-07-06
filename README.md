@@ -224,6 +224,17 @@ The generator is provider-agnostic behind an OpenAI-compatible client. Configure
 - `docs/eval-reports/` — the eval gate reports cited above; `DECISIONS.md` — architectural
   decisions as they were made; `SPEC.md` — the full project plan.
 
+## Roadmap
+
+- Warn on unrecognized `RETRIEVE_MODE` values instead of silently falling back to dense retrieval.
+- Show an error card when the review stream fails at the connection level (currently silent).
+- Doc-vocabulary-aware objective suggestions for the hosted lexical mode (some suggestion chips
+  have no exact-word match in the curated docs and correctly-but-confusingly report a missing clause).
+- Stream per-step status events as each step actually runs (an `onStep` callback through
+  `reviewContract`) instead of in a burst at completion.
+- Treat `LLM_MAX_TOKENS` as a floor/default rather than an override of deliberate per-callsite
+  budgets (judge 512 / redline 2048).
+
 ## Non-goals
 
 Not legal advice — a human makes every decision. Not a multi-contract enterprise platform. Not a
